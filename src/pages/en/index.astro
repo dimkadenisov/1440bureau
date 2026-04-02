@@ -1,0 +1,41 @@
+---
+// src/pages/en/index.astro
+import Layout from '../../layouts/Layout.astro';
+import Nav from '../../components/Nav.astro';
+import Hero from '../../components/Hero.astro';
+import Mission from '../../components/Mission.astro';
+import Technologies from '../../components/Technologies.astro';
+import Solutions from '../../components/Solutions.astro';
+import Timeline from '../../components/Timeline.astro';
+import Team from '../../components/Team.astro';
+import Why1440 from '../../components/Why1440.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import Footer from '../../components/Footer.astro';
+
+const lang = 'en' as const;
+---
+
+<Layout
+  title="Bureau 1440 — Russian Low-Orbit Satellite System"
+  description="Building a low-orbit satellite system for broadband connectivity anywhere on Earth."
+  lang={lang}
+  canonicalUrl="https://1440.space/en/"
+>
+  <Nav lang={lang} currentPath="en/" />
+  <main>
+    <Hero lang={lang} />
+    <Mission lang={lang} />
+    <Technologies lang={lang} />
+    <Solutions lang={lang} />
+    <Timeline lang={lang} />
+    <Team lang={lang} />
+    <Why1440 lang={lang} />
+    <ContactForm lang={lang} />
+  </main>
+  <Footer lang={lang} />
+</Layout>
+
+<script>
+  import { initAnimations } from '../../scripts/animations';
+  initAnimations();
+</script>
