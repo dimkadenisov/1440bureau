@@ -1,0 +1,87 @@
+<h2>Три подхода к реализации</h2>
+<p class="subtitle">Выбери подход — это определит баланс между визуальной сложностью и производительностью</p>
+
+<div class="cards">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0f;height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <!-- Animated globe mock -->
+      <div style="width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1a3a6e,#0a1628 60%,#000 100%);border:1px solid #7a00df;position:relative;box-shadow:0 0 30px rgba(122,0,223,0.3);">
+        <!-- orbit lines -->
+        <div style="position:absolute;inset:-20px;border-radius:50%;border:1px solid rgba(122,0,223,0.4);transform:rotateX(75deg);"></div>
+        <div style="position:absolute;inset:-20px;border-radius:50%;border:1px solid rgba(122,0,223,0.3);transform:rotateX(75deg) rotateZ(60deg);"></div>
+        <div style="position:absolute;inset:-20px;border-radius:50%;border:1px solid rgba(122,0,223,0.25);transform:rotateX(75deg) rotateZ(-60deg);"></div>
+        <!-- satellite dot -->
+        <div style="width:5px;height:5px;background:#7a00df;border-radius:50%;position:absolute;top:-22px;left:50%;box-shadow:0 0 6px #7a00df;"></div>
+      </div>
+      <div style="position:absolute;top:8px;right:8px;font-size:10px;color:#7a00df;letter-spacing:1px;">WEBGL</div>
+    </div>
+    <div class="card-body">
+      <h3>A — Three.js WebGL Globe</h3>
+      <p>Фотореалистичный 3D глобус с настоящими орбитальными траекториями. Текстура Земли, атмосферное свечение, анимированные спутники.</p>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>За</h4><ul><li>Максимальный wow-эффект</li><li>Настоящие орбиты TLE</li><li>Closest to Cloudflare ref</li></ul></div>
+        <div class="cons"><h4>Против</h4><ul><li>~200KB JS (Three.js)</li><li>Нужна оптимизация под Lighthouse</li><li>Lazy load обязателен</li></ul></div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#7a00df;">Lighthouse: 90–95 при правильной реализации</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0f;height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <!-- Canvas globe mock -->
+      <div style="width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#1a3a6e,#0a1628 60%,#000 100%);border:1px solid rgba(122,0,223,0.6);position:relative;">
+        <!-- latitude lines -->
+        <div style="position:absolute;top:30%;left:0;right:0;height:1px;background:rgba(255,255,255,0.08);"></div>
+        <div style="position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(255,255,255,0.12);"></div>
+        <div style="position:absolute;top:70%;left:0;right:0;height:1px;background:rgba(255,255,255,0.08);"></div>
+        <!-- longitude lines -->
+        <div style="position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(255,255,255,0.08);"></div>
+        <div style="position:absolute;top:0;bottom:0;left:30%;width:1px;background:rgba(255,255,255,0.06);transform:perspective(100px) rotateY(30deg);"></div>
+        <!-- orbit path SVG-like -->
+        <div style="position:absolute;inset:-15px;border-radius:50%;border:1px dashed rgba(122,0,223,0.5);transform:rotateX(70deg) rotateZ(30deg);"></div>
+        <div style="width:4px;height:4px;background:#fff;border-radius:50%;position:absolute;top:-17px;left:58%;box-shadow:0 0 4px #7a00df;"></div>
+      </div>
+      <div style="position:absolute;top:8px;right:8px;font-size:10px;color:#7a00df;letter-spacing:1px;">CANVAS</div>
+    </div>
+    <div class="card-body">
+      <h3>B — Canvas 2D Globe</h3>
+      <p>Глобус на Canvas API: wireframe-сетка, анимированные орбиты, спутники. Нет зависимости от Three.js. Всё рисуется вручную.</p>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>За</h4><ul><li>~0 внешних зависимостей</li><li>Полный контроль</li><li>Лёгкий (~15KB кода)</li></ul></div>
+        <div class="cons"><h4>Против</h4><ul><li>Менее реалистично</li><li>Больше ручной работы</li><li>Без текстуры Земли</li></ul></div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#7a00df;">Lighthouse: 95–100</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0a0f;height:160px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;">
+      <!-- CSS globe mock -->
+      <div style="position:relative;width:100px;height:100px;">
+        <div style="width:100px;height:100px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#162845,#0a1628 70%,#000);border:1px solid rgba(122,0,223,0.4);"></div>
+        <!-- CSS-only rotating ring -->
+        <div style="position:absolute;inset:-18px;top:50%;height:36px;margin-top:-18px;border-radius:50%;border:1px solid rgba(122,0,223,0.6);transform:rotateX(80deg);animation:spin 4s linear infinite;"></div>
+        <div style="position:absolute;inset:-22px;top:50%;height:44px;margin-top:-22px;border-radius:50%;border:1px solid rgba(122,0,223,0.3);transform:rotateX(80deg) rotateZ(50deg);"></div>
+      </div>
+      <style>@keyframes spin{from{transform:rotateX(80deg) rotateZ(0)}to{transform:rotateX(80deg) rotateZ(360deg)}}</style>
+      <div style="position:absolute;top:8px;right:8px;font-size:10px;color:#7a00df;letter-spacing:1px;">CSS</div>
+    </div>
+    <div class="card-body">
+      <h3>C — CSS/SVG Globe</h3>
+      <p>Глобус полностью на CSS transforms + SVG. Орбиты — анимированные SVG-эллипсы. Нет JS для глобуса вообще.</p>
+      <div class="pros-cons" style="margin-top:12px;">
+        <div class="pros"><h4>За</h4><ul><li>Zero JS overhead</li><li>Идеальный Lighthouse</li><li>GPU-ускоренные анимации</li></ul></div>
+        <div class="cons"><h4>Против</h4><ul><li>Наименее реалистично</li><li>Ограниченная интерактивность</li><li>Сложно имитировать 3D</li></ul></div>
+      </div>
+      <p style="margin-top:8px;font-size:12px;color:#7a00df;">Lighthouse: 98–100</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="margin-top:24px;padding:16px;background:rgba(122,0,223,0.08);border:1px solid rgba(122,0,223,0.2);border-radius:8px;">
+  <p style="margin:0;font-size:13px;color:#ccc;">
+    <strong style="color:#7a00df;">Моя рекомендация: A (Three.js)</strong> — при правильной реализации (dynamic import, defer, intersection observer) даёт 90+ Lighthouse и максимальный wow-эффект, как на Cloudflare. Подходит для aerospace-компании.
+  </p>
+</div>

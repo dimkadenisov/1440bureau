@@ -1,0 +1,6 @@
+{"type":"server-started","port":62757,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:62757","screen_dir":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/43715-1775136062/content","state_dir":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/43715-1775136062/state"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/43715-1775136062/content/approaches.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/43715-1775136062/content/page-structure.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/43715-1775136062/content/page-structure-v2.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/43715-1775136062/content/page-structure-v3.html"}
+{"type":"server-stopped","reason":"idle timeout"}
