@@ -1,0 +1,81 @@
+---
+// src/components/Solutions.astro
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const solutions = [
+  'extractive', 'geo', 'telecom', 'aviation',
+  'rail', 'maritime', 'auto', 'education',
+  'health', 'emergency', 'gov',
+] as const;
+---
+
+<section class="section" id="solutions">
+  <p class="label" data-animate>{t('solutions.label')}</p>
+  <h2 class="solutions__title" data-animate>{t('solutions.title')}</h2>
+
+  <ul class="solutions__grid" role="list">
+    {solutions.map((key) => (
+      <li class="solutions__item" data-animate>
+        <span class="solutions__item-name">{t(`solutions.${key}` as any)}</span>
+        <span class="solutions__item-arrow" aria-hidden="true">→</span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .solutions__title {
+    font-size: clamp(24px, 3vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 12px 0 48px;
+  }
+
+  .solutions__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--color-border);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    overflow: hidden;
+    list-style: none;
+  }
+
+  .solutions__item {
+    background: var(--color-bg);
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    transition: background 0.15s ease;
+    cursor: default;
+  }
+
+  .solutions__item:hover {
+    background: var(--color-surface);
+  }
+
+  .solutions__item-name {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .solutions__item-arrow {
+    color: var(--color-muted);
+    font-size: 14px;
+    transition: transform 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .solutions__item:hover .solutions__item-arrow {
+    transform: translateX(4px);
+    color: var(--color-text);
+  }
+</style>

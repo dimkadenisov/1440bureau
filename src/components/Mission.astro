@@ -1,0 +1,90 @@
+---
+// src/components/Mission.astro
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const specs = [
+  { value: t('mission.spec1_value'), label: t('mission.spec1_label') },
+  { value: t('mission.spec2_value'), label: t('mission.spec2_label') },
+  { value: t('mission.spec3_value'), label: t('mission.spec3_label') },
+];
+---
+
+<section class="section" id="mission">
+  <h2 class="mission__title" data-animate>{t('mission.title')}</h2>
+  <div class="mission__specs">
+    {specs.map((s) => (
+      <div class="mission__spec" data-animate>
+        <div class="mission__spec-value">{s.value}</div>
+        <div class="mission__spec-label">{s.label}</div>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .mission__title {
+    font-size: clamp(28px, 4vw, 56px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    text-transform: uppercase;
+    max-width: 900px;
+    margin-bottom: 60px;
+  }
+
+  .mission__specs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .mission__spec {
+    padding: 32px 0;
+    border-right: 1px solid var(--color-border);
+    padding-right: 40px;
+  }
+
+  .mission__spec:first-child {
+    padding-left: 0;
+  }
+
+  .mission__spec:last-child {
+    border-right: none;
+    padding-left: 40px;
+  }
+
+  .mission__spec:nth-child(2) {
+    padding-left: 40px;
+  }
+
+  .mission__spec-value {
+    font-size: clamp(28px, 3vw, 44px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .mission__spec-label {
+    font-size: 13px;
+    color: var(--color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  @media (max-width: 600px) {
+    .mission__specs {
+      grid-template-columns: 1fr;
+    }
+    .mission__spec {
+      border-right: none;
+      border-bottom: 1px solid var(--color-border);
+      padding: 24px 0 !important;
+    }
+  }
+</style>

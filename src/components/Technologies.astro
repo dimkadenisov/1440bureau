@@ -1,0 +1,141 @@
+---
+// src/components/Technologies.astro
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const techs = [1, 2, 3, 4, 5].map((n) => ({
+  num: String(n).padStart(2, '0'),
+  name: t(`tech.${n}_name` as any),
+  desc: t(`tech.${n}_desc` as any),
+}));
+---
+
+<section class="tech-outer" id="technologies" aria-label={t('tech.label')}>
+  <div class="tech-pin" id="tech-pin">
+    <div class="tech-header section" style="padding-bottom:0">
+      <p class="label" data-animate>{t('tech.label')}</p>
+    </div>
+    <div class="tech-track-wrap">
+      <div class="tech-track" id="tech-track">
+        {techs.map((tech) => (
+          <div class="tech-card">
+            <span class="tech-card__num label">{tech.num}</span>
+            <h3 class="tech-card__name">{tech.name}</h3>
+            <p class="tech-card__desc">{tech.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .tech-outer {
+    height: 300vh;
+  }
+
+  .tech-pin {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .tech-header {
+    flex-shrink: 0;
+    padding-bottom: 24px !important;
+  }
+
+  .tech-track-wrap {
+    overflow: hidden;
+    flex: 1;
+    display: flex;
+    align-items: center;
+  }
+
+  .tech-track {
+    display: flex;
+    gap: 24px;
+    padding: 0 40px;
+    will-change: transform;
+  }
+
+  .tech-card {
+    flex-shrink: 0;
+    width: min(340px, 80vw);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 36px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .tech-card__num {
+    display: block;
+  }
+
+  .tech-card__name {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .tech-card__desc {
+    font-size: 15px;
+    color: var(--color-muted);
+    line-height: 1.6;
+  }
+
+  @media (max-width: 768px) {
+    .tech-outer { height: auto; }
+    .tech-pin { position: static; height: auto; }
+    .tech-track { overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 16px; }
+    .tech-card { scroll-snap-align: start; }
+  }
+</style>
+
+<script>
+  async function initTech() {
+    const { gsap } = await import('gsap');
+    const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+    gsap.registerPlugin(ScrollTrigger);
+
+    const track = document.getElementById('tech-track')!;
+    const outer = document.getElementById('technologies')!;
+
+    if (window.matchMedia('(max-width: 768px)').matches) return;
+
+    const totalScroll = track.scrollWidth - window.innerWidth + 80;
+
+    gsap.to(track, {
+      x: -totalScroll,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: outer,
+        start: 'top top',
+        end: `+=${outer.clientHeight - window.innerHeight}`,
+        scrub: 1,
+      },
+    });
+  }
+
+  let techInited = false;
+  const techObserver = new IntersectionObserver((entries) => {
+    if (entries[0]?.isIntersecting && !techInited) {
+      techInited = true;
+      techObserver.disconnect();
+      initTech();
+    }
+  });
+  const techSection = document.getElementById('technologies');
+  if (techSection) techObserver.observe(techSection);
+</script>
