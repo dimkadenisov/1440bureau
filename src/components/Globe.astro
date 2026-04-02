@@ -81,7 +81,7 @@
 <script>
   const wrap = document.getElementById('globe-wrap')!;
   const canvas = document.getElementById('globe-canvas') as HTMLCanvasElement;
-  const svg = document.getElementById('globe-svg') as SVGElement;
+  const svg = document.getElementById('globe-svg') as unknown as SVGElement;
 
   let loaded = false;
 
