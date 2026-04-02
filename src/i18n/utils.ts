@@ -5,11 +5,11 @@ export type Lang = 'ru' | 'en';
 
 const LANGS: Lang[] = ['ru', 'en'];
 
-const translations: Record<Lang, typeof ru> = { ru, en: en as typeof ru };
+const translations: Record<Lang, typeof ru> = { ru, en: en as unknown as typeof ru };
 
 export function getLangFromUrl(url: URL): Lang {
   const [, first] = url.pathname.split('/');
-  if ((LANGS as string[]).includes(first)) return first as Lang;
+  if (first !== undefined && (LANGS as string[]).includes(first)) return first as Lang;
   return 'ru';
 }
 

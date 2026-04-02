@@ -1,6 +1,5 @@
 import { describe, it, expect } from 'vitest';
 import { getLangFromUrl, useTranslations } from './utils';
-import type { Lang } from './utils';
 
 describe('getLangFromUrl', () => {
   it('returns ru for root path', () => {
