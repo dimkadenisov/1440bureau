@@ -164,4 +164,12 @@ const otherLangPath = getLocalePath(otherLang, currentPath);
     links.style.background = 'var(--color-bg)';
     links.style.padding = '20px';
   });
+
+  // Close menu on nav link click (mobile)
+  nav.querySelectorAll('.nav__links a').forEach((link) => {
+    link.addEventListener('click', () => {
+      burger.setAttribute('aria-expanded', 'false');
+      links.style.display = '';
+    });
+  });
 </script>

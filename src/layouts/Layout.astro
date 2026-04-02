@@ -31,6 +31,24 @@ const {
     <title>{title}</title>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <slot />
   </body>
 </html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    padding: 8px 16px;
+    background: #fff;
+    color: #000;
+    font-size: 14px;
+    z-index: 9999;
+    transition: top 0.1s;
+  }
+  .skip-link:focus {
+    top: 0;
+  }
+</style>

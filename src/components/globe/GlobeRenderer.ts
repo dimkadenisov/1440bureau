@@ -24,6 +24,7 @@ export class GlobeRenderer {
   private satDots: THREE.Group;
   private animId = 0;
   private fpsMonitor: FpsMonitor = { frameCount: 0, lastTime: 0, fps: 60, level: 0 };
+  private resizeObserver!: ResizeObserver;
 
   constructor(private canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
@@ -51,7 +52,8 @@ export class GlobeRenderer {
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
     this.onResize();
-    window.addEventListener('resize', this.onResize);
+    this.resizeObserver = new ResizeObserver(this.onResize);
+    this.resizeObserver.observe(this.canvas);
   }
 
   private createGlobeSphere(): THREE.Mesh {
@@ -224,6 +226,7 @@ export class GlobeRenderer {
   }
 
   start(): void {
+    this.fpsMonitor.lastTime = performance.now();
     let rotY = 0;
 
     const tick = (now: number) => {
@@ -256,7 +259,7 @@ export class GlobeRenderer {
 
   destroy(): void {
     this.stop();
-    window.removeEventListener('resize', this.onResize);
+    this.resizeObserver.disconnect();
     this.renderer.dispose();
   }
 }

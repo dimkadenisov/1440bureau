@@ -98,11 +98,12 @@
     });
     renderer.buildOrbits();
     renderer.start();
+    window.addEventListener('beforeunload', () => renderer.destroy(), { once: true });
 
     // Crossfade SVG → canvas
     canvas.style.opacity = '1';
     svg.style.opacity = '0';
-    setTimeout(() => { svg.style.display = 'none'; }, 700);
+    svg.addEventListener('transitionend', () => { svg.style.display = 'none'; }, { once: true });
   }, { threshold: 0.1 });
 
   observer.observe(wrap);
