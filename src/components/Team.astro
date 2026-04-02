@@ -1,0 +1,118 @@
+---
+// src/components/Team.astro
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const photos = [
+  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a5e_team-1.webp',
+  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a5f_team-2.webp',
+  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a60_team-3.webp',
+  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a61_team-4.webp',
+  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a62_team-5.webp',
+  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a63_team-6.webp',
+];
+---
+
+<section class="section" id="team">
+  <p class="label" data-animate>{t('team.label')}</p>
+  <div class="team__header">
+    <h2 class="team__title" data-animate>{t('team.title')}</h2>
+    <div class="team__stats" data-animate="fade">
+      <p class="team__stat">{t('team.stat_count')}</p>
+      <p class="team__stat team__stat--muted">{t('team.stat_engineers')}</p>
+    </div>
+  </div>
+
+  <div class="team__carousel" data-animate="fade">
+    {photos.map((src, i) => (
+      <div class="team__photo">
+        <img
+          src={src}
+          alt={`Team member ${i + 1}`}
+          width="400"
+          height="500"
+          loading="lazy"
+          onerror="this.parentElement.style.background='var(--color-surface)'"
+        />
+      </div>
+    ))}
+  </div>
+
+  <div class="team__cta" data-animate>
+    <a href="mailto:join@1440.space" class="btn btn-secondary">{t('team.cta')} →</a>
+  </div>
+</section>
+
+<style>
+  .team__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 40px;
+    margin: 12px 0 48px;
+    flex-wrap: wrap;
+  }
+
+  .team__title {
+    font-size: clamp(22px, 2.5vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    max-width: 500px;
+    line-height: 1.2;
+  }
+
+  .team__stats {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .team__stat {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .team__stat--muted {
+    font-size: 13px;
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+
+  .team__carousel {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 8px;
+    margin-bottom: 40px;
+  }
+
+  .team__carousel::-webkit-scrollbar { display: none; }
+
+  .team__photo {
+    flex-shrink: 0;
+    width: 280px;
+    height: 360px;
+    border-radius: 6px;
+    overflow: hidden;
+    scroll-snap-align: start;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  .team__photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .team__cta {
+    display: flex;
+  }
+</style>

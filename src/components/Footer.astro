@@ -1,0 +1,151 @@
+---
+// src/components/Footer.astro
+import { useTranslations, getLocalePath } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const contacts = [
+  { label: 'General', email: 'info@1440.space' },
+  { label: 'Media', email: 'press@1440.space' },
+  { label: 'HR', email: 'join@1440.space' },
+  { label: 'Business', email: 'connect@1440.space' },
+  { label: 'SSA', email: 'conjunctions@1440.space' },
+];
+
+const docs = [
+  t('footer.doc1'), t('footer.doc2'), t('footer.doc3'),
+  t('footer.doc4'), t('footer.doc5'),
+];
+---
+
+<footer class="footer">
+  <div class="footer__inner section" style="padding-top:60px;padding-bottom:40px;">
+    <div class="footer__top">
+      <div class="footer__col">
+        <p class="label">{t('footer.contacts')}</p>
+        <ul class="footer__list">
+          {contacts.map((c) => (
+            <li><a href={`mailto:${c.email}`}>{c.email}</a></li>
+          ))}
+        </ul>
+      </div>
+      <div class="footer__col">
+        <p class="label">{t('footer.address')}</p>
+        <address>
+          <p>Москва, Столярный пер. 3/14</p>
+          <p><a href="tel:+74954453301">+7(495) 445-33-01</a></p>
+          <p>ИНН 7707446530</p>
+        </address>
+      </div>
+      <div class="footer__col">
+        <p class="label">{t('footer.docs')}</p>
+        <ul class="footer__list">
+          {docs.map((doc) => (
+            <li><a href="#" class="footer__doc-link">{doc}</a></li>
+          ))}
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <a href={getLocalePath(lang)} class="footer__logo">
+        <img src="/logos/logo-icon.svg" alt="" width="20" height="20" />
+        <img src="/logos/logo-text.svg" alt="Бюро 1440" height="14" />
+      </a>
+      <div class="footer__links">
+        <a href="https://t.me/bureau_1440" target="_blank" rel="noopener">Telegram</a>
+        <a href={getLocalePath(lang === 'ru' ? 'en' : 'ru')}>{lang === 'ru' ? 'EN' : 'RU'}</a>
+      </div>
+      <p class="footer__copy">© {new Date().getFullYear()} Бюро 1440</p>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--color-border);
+    margin-top: 40px;
+  }
+
+  .footer__top {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 40px;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .footer__col .label {
+    display: block;
+    margin-bottom: 16px;
+  }
+
+  .footer__list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer__list a,
+  address p {
+    font-size: 13px;
+    color: var(--color-muted);
+    font-style: normal;
+    line-height: 1.6;
+  }
+
+  .footer__list a:hover,
+  address a:hover {
+    color: var(--color-text);
+  }
+
+  .footer__doc-link {
+    font-size: 12px;
+  }
+
+  .footer__bottom {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .footer__logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .footer__links {
+    display: flex;
+    gap: 20px;
+    flex: 1;
+  }
+
+  .footer__links a {
+    font-size: 12px;
+    color: var(--color-muted);
+    transition: color 0.15s ease;
+  }
+
+  .footer__links a:hover {
+    color: var(--color-text);
+  }
+
+  .footer__copy {
+    font-size: 12px;
+    color: var(--color-muted);
+    margin-left: auto;
+  }
+
+  @media (max-width: 768px) {
+    .footer__top { grid-template-columns: 1fr; gap: 32px; }
+    .footer__copy { margin-left: 0; }
+  }
+</style>

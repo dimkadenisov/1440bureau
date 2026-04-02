@@ -1,0 +1,24 @@
+---
+// src/components/Why1440.astro
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section class="section why" id="why">
+  <p class="label" data-animate>{t('why.label')}</p>
+  <p class="why__text" data-animate>{t('why.text')}</p>
+</section>
+
+<style>
+  .why__text {
+    font-size: clamp(18px, 2vw, 26px);
+    color: var(--color-muted);
+    line-height: 1.7;
+    max-width: 700px;
+    margin-top: 16px;
+  }
+</style>
