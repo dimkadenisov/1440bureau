@@ -1,11 +1,11 @@
 // src/components/globe/GlobeRenderer.ts
-import * as THREE from 'three';
-import { generateOrbit, SATELLITES, type Vec3 } from './OrbitalData';
+import * as THREE from "three";
+import { generateOrbit, SATELLITES, type Vec3 } from "./OrbitalData";
 
 const GLOBE_RADIUS = 1;
-const DOT_COUNT = 12000;
-const DOT_SIZE = 0.006;
 const ORBIT_STEPS = 128;
+const DOT_SIZE = 0.018; // world-unit size for THREE.Points (sizeAttenuation=true)
+const GLOBE_TILT_X = 0.35; // ~20° tilt — north pole toward camera
 
 interface FpsMonitor {
   frameCount: number;
@@ -19,21 +19,31 @@ export class GlobeRenderer {
   private scene: THREE.Scene;
   private camera: THREE.PerspectiveCamera;
   private globe: THREE.Mesh;
-  private dots: THREE.InstancedMesh;
+  private dots: THREE.Points;
   private orbitLines: THREE.Group;
   private satDots: THREE.Group;
   private animId = 0;
-  private fpsMonitor: FpsMonitor = { frameCount: 0, lastTime: 0, fps: 60, level: 0 };
+  private pendingSize: { w: number; h: number } | null = null;
+  private fpsMonitor: FpsMonitor = {
+    frameCount: 0,
+    lastTime: 0,
+    fps: 60,
+    level: 0,
+  };
   private resizeObserver!: ResizeObserver;
 
   constructor(private canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true,
+    });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
-    this.camera.position.set(0, 0, 3);
+    this.camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    this.camera.position.set(0, 0, 3); // overwritten by applySize on first resize
 
     this.globe = this.createGlobeSphere();
     this.scene.add(this.globe);
@@ -51,104 +61,159 @@ export class GlobeRenderer {
 
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
-    this.onResize();
-    this.resizeObserver = new ResizeObserver(this.onResize);
-    this.resizeObserver.observe(this.canvas);
+    const parent = this.canvas.parentElement ?? this.canvas;
+    this.resizeObserver = new ResizeObserver((entries) => {
+      const { width: w, height: h } = entries[0]!.contentRect;
+      if (w === 0 || h === 0) return;
+      this.applySize(w, h);
+    });
+    this.resizeObserver.observe(parent);
+    const { width: w, height: h } = parent.getBoundingClientRect();
+    if (w > 0 && h > 0) this.flushSize(w, h);
+  }
+
+  private applySize(w: number, h: number): void {
+    // Defer actual resize to the next render tick to avoid a blank frame
+    this.pendingSize = { w, h };
+  }
+
+  private flushSize(w: number, h: number): void {
+    this.renderer.setSize(w, h, false);
+    const aspect = w / h;
+    this.camera.aspect = aspect;
+    // Move camera so globe (radius 1) always fits with 15% margin,
+    // regardless of whether the container is portrait or landscape.
+    const halfFovRad = (this.camera.fov / 2) * (Math.PI / 180);
+    const fitDist = GLOBE_RADIUS / (Math.tan(halfFovRad) * Math.min(aspect, 1));
+    this.camera.position.z = fitDist * 1.15;
+    this.camera.updateProjectionMatrix();
   }
 
   private createGlobeSphere(): THREE.Mesh {
     const geo = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
-    const mat = new THREE.MeshBasicMaterial({ color: 0x0a0e14, transparent: true, opacity: 0.95 });
+    const mat = new THREE.MeshBasicMaterial({ color: 0x0a0e14 });
     return new THREE.Mesh(geo, mat);
   }
 
-  private createDotPlaceholder(): THREE.InstancedMesh {
-    // Placeholder while world map loads — evenly distributed dots
-    const geo = new THREE.CircleGeometry(DOT_SIZE, 5);
-    const mat = new THREE.MeshBasicMaterial({ color: 0x334155, side: THREE.DoubleSide });
-    const mesh = new THREE.InstancedMesh(geo, mat, DOT_COUNT);
-    const dummy = new THREE.Object3D();
-    for (let i = 0; i < DOT_COUNT; i++) {
-      const phi = Math.acos(2 * Math.random() - 1);
-      const theta = Math.random() * Math.PI * 2;
-      dummy.position.set(
-        GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
-        GLOBE_RADIUS * Math.cos(phi),
-        GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
-      );
-      dummy.lookAt(0, 0, 0);
-      dummy.translateZ(0.001);
-      dummy.updateMatrix();
-      mesh.setMatrixAt(i, dummy.matrix);
+  private createCircleTexture(): THREE.Texture {
+    const size = 64;
+    const cv = document.createElement("canvas");
+    cv.width = size;
+    cv.height = size;
+    const ctx = cv.getContext("2d")!;
+    ctx.clearRect(0, 0, size, size);
+    ctx.beginPath();
+    ctx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+    const tex = new THREE.CanvasTexture(cv);
+    return tex;
+  }
+
+  private createDotPlaceholder(): THREE.Points {
+    // Evenly distributed placeholder dots using staggered hex grid
+    const positions: number[] = [];
+    const LAT_STEP = 1.5;
+    let rowIndex = 0;
+    for (let lat = -90 + LAT_STEP / 2; lat < 90; lat += LAT_STEP, rowIndex++) {
+      const cosLat = Math.cos(lat * (Math.PI / 180));
+      if (cosLat < 1e-4) continue;
+      const lonStep = LAT_STEP / cosLat;
+      const offset = rowIndex % 2 === 0 ? 0 : lonStep / 2;
+      for (let lon = -180 + offset; lon < 180; lon += lonStep) {
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        positions.push(
+          -GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
+          GLOBE_RADIUS * Math.cos(phi),
+          GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
+        );
+      }
     }
-    mesh.instanceMatrix.needsUpdate = true;
-    return mesh;
+
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(positions, 3),
+    );
+
+    const mat = new THREE.PointsMaterial({
+      color: 0x334155,
+      size: DOT_SIZE,
+      sizeAttenuation: true,
+      map: this.createCircleTexture(),
+      alphaTest: 0.5,
+      transparent: true,
+    });
+
+    return new THREE.Points(geo, mat);
   }
 
   async loadWorldMap(url: string): Promise<void> {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    img.crossOrigin = "anonymous";
     await new Promise<void>((res, rej) => {
       img.onload = () => res();
       img.onerror = rej;
       img.src = url;
     });
 
-    const canvas = document.createElement('canvas');
-    canvas.width = img.width;
-    canvas.height = img.height;
-    const ctx = canvas.getContext('2d')!;
+    const cv = document.createElement("canvas");
+    cv.width = img.width;
+    cv.height = img.height;
+    const ctx = cv.getContext("2d")!;
     ctx.drawImage(img, 0, 0);
-    const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const imgData = ctx.getImageData(0, 0, cv.width, cv.height);
+    const { data, width, height } = imgData;
 
     const isLand = (lat: number, lon: number): boolean => {
-      const x = Math.floor(((lon + 180) / 360) * canvas.width) % canvas.width;
-      const y = Math.floor(((90 - lat) / 180) * canvas.height);
-      const idx = (y * canvas.width + x) * 4;
-      return data.data[idx]! > 128; // white = land
+      const px = Math.floor(((lon + 180) / 360) * width);
+      const py = Math.floor(((90 - lat) / 180) * height);
+      const idx =
+        (Math.min(py, height - 1) * width + Math.min(px, width - 1)) * 4;
+      return data[idx]! > 128; // R channel: white=land
     };
 
-    const positions: Vec3[] = [];
-    const dummy = new THREE.Object3D();
-    let placed = 0;
-    let attempts = 0;
-    const maxAttempts = DOT_COUNT * 8;
-
-    while (placed < DOT_COUNT && attempts < maxAttempts) {
-      attempts++;
-      const lat = Math.asin(2 * Math.random() - 1) * (180 / Math.PI);
-      const lon = Math.random() * 360 - 180;
-      if (!isLand(lat, lon)) continue;
-
-      const phi = (90 - lat) * (Math.PI / 180);
-      const theta = (lon + 180) * (Math.PI / 180);
-      const pos: Vec3 = [
-        -GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
-         GLOBE_RADIUS * Math.cos(phi),
-         GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
-      ];
-      positions.push(pos);
-      placed++;
+    const positions: number[] = [];
+    const LAT_STEP = 1.0;
+    let rowIndex = 0;
+    for (let lat = -90 + LAT_STEP / 2; lat < 90; lat += LAT_STEP, rowIndex++) {
+      const cosLat = Math.cos(lat * (Math.PI / 180));
+      if (cosLat < 1e-4) continue;
+      const lonStep = LAT_STEP / cosLat;
+      const offset = rowIndex % 2 === 0 ? 0 : lonStep / 2;
+      for (let lon = -180 + offset; lon < 180; lon += lonStep) {
+        if (!isLand(lat, lon)) continue;
+        const phi = (90 - lat) * (Math.PI / 180);
+        const theta = (lon + 180) * (Math.PI / 180);
+        positions.push(
+          -GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
+          GLOBE_RADIUS * Math.cos(phi),
+          GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
+        );
+      }
     }
 
-    const geo = new THREE.CircleGeometry(DOT_SIZE, 5);
-    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, opacity: 0.7, transparent: true });
-    const newMesh = new THREE.InstancedMesh(geo, mat, positions.length);
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute(
+      "position",
+      new THREE.Float32BufferAttribute(positions, 3),
+    );
 
-    for (let i = 0; i < positions.length; i++) {
-      const [x, y, z] = positions[i]!;
-      dummy.position.set(x, y, z);
-      dummy.lookAt(0, 0, 0);
-      dummy.translateZ(0.001);
-      dummy.updateMatrix();
-      newMesh.setMatrixAt(i, dummy.matrix);
-    }
-    newMesh.instanceMatrix.needsUpdate = true;
+    const mat = new THREE.PointsMaterial({
+      color: 0xffffff,
+      size: DOT_SIZE,
+      sizeAttenuation: true,
+      map: this.createCircleTexture(),
+      alphaTest: 0.5,
+      transparent: true,
+      opacity: 0.85,
+    });
 
     this.scene.remove(this.dots);
     this.dots.geometry.dispose();
     (this.dots.material as THREE.Material).dispose();
-    this.dots = newMesh;
+    this.dots = new THREE.Points(geo, mat);
     this.scene.add(this.dots);
   }
 
@@ -156,30 +221,46 @@ export class GlobeRenderer {
     this.orbitLines.clear();
     this.satDots.clear();
 
-    const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 });
+    // Tilt groups to match globe
+    this.orbitLines.rotation.x = GLOBE_TILT_X;
+    this.satDots.rotation.x = GLOBE_TILT_X;
+
+    // Shared tube material — single mesh per orbit, no cap overlap
+    const tubeMat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.28,
+      depthWrite: false,
+    });
+
     const satGeo = new THREE.SphereGeometry(0.012, 8, 8);
     const satMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const sat of SATELLITES) {
       const points = generateOrbit({ ...sat, steps: ORBIT_STEPS });
-      const loopVerts = new Float32Array([...points, points[0]!].flatMap(p => p));
-      const loopGeo = new THREE.BufferGeometry();
-      loopGeo.setAttribute('position', new THREE.BufferAttribute(loopVerts, 3));
 
-      this.orbitLines.add(new THREE.Line(loopGeo, lineMat));
+      // TubeGeometry from CatmullRomCurve3 — continuous mesh, uniform colour
+      const curve = new THREE.CatmullRomCurve3(
+        points.map(([x, y, z]) => new THREE.Vector3(x, y, z)),
+        true, // closed
+      );
+      const tubeGeo = new THREE.TubeGeometry(curve, 80, 0.004, 4, true);
+      this.orbitLines.add(new THREE.Mesh(tubeGeo, tubeMat));
 
-      // Satellite dot at current position
-      const [sx, sy, sz] = points[0]!;
+      // Satellite — float progress for lerp-based smooth motion
+      const startProg = Math.random() * ORBIT_STEPS;
+      const startIdx = Math.floor(startProg) % ORBIT_STEPS;
+      const [sx, sy, sz] = points[startIdx]!;
       const satMesh = new THREE.Mesh(satGeo, satMat);
       satMesh.position.set(sx, sy, sz);
-      satMesh.userData['orbitPoints'] = points;
-      satMesh.userData['orbitIndex'] = Math.floor(Math.random() * ORBIT_STEPS);
+      satMesh.userData["orbitPoints"] = points;
+      satMesh.userData["orbitProgress"] = startProg;
       this.satDots.add(satMesh);
     }
   }
 
   private addAtmosphere(): void {
-    const geo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.08, 32, 32);
+    const geo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.1, 32, 32);
     const mat = new THREE.ShaderMaterial({
       vertexShader: `
         varying vec3 vNormal;
@@ -191,24 +272,60 @@ export class GlobeRenderer {
       fragmentShader: `
         varying vec3 vNormal;
         void main() {
-          float intensity = pow(0.6 - dot(vNormal, vec3(0.0, 0.0, 1.0)), 3.0);
-          gl_FragColor = vec4(0.4, 0.6, 1.0, 1.0) * intensity * 0.4;
+          // Classic rim-light atmosphere: bright at outer silhouette (cosA=0),
+          // fades to 0 at inner boundary (~cosA=0.7, occluded by globe).
+          float cosA = abs(dot(vNormal, vec3(0.0, 0.0, 1.0)));
+          float rim = 1.0 - exp(-cosA * 3.0);
+
+          // Directional bias (outward normals, no BackSide flip):
+          //   top  → vNormal.y = +1  → use  vNormal.y
+          //   left → vNormal.x = -1  → use -vNormal.x
+          float nBias = clamp( vNormal.y, 0.0, 1.0);
+          float wBias = clamp(-vNormal.x, 0.0, 1.0);
+          float dirFactor = mix(0.05, 1.0, nBias * 0.65 + wBias * 0.35);
+
+          float alpha = rim * dirFactor * 0.9;
+          gl_FragColor = vec4(0.35, 0.58, 1.0, alpha);
         }
       `,
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
       transparent: true,
+      depthWrite: false,
     });
     this.scene.add(new THREE.Mesh(geo, mat));
-  }
 
-  private onResize = (): void => {
-    const w = this.canvas.clientWidth;
-    const h = this.canvas.clientHeight;
-    this.renderer.setSize(w, h, false);
-    this.camera.aspect = w / h;
-    this.camera.updateProjectionMatrix();
-  };
+    // Thin bright rim — tighter falloff, higher alpha
+    const geo2 = new THREE.SphereGeometry(GLOBE_RADIUS * 1.04, 32, 32);
+    const mat2 = new THREE.ShaderMaterial({
+      vertexShader: `
+        varying vec3 vNormal;
+        void main() {
+          vNormal = normalize(normalMatrix * normal);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vNormal;
+        void main() {
+          float cosA = abs(dot(vNormal, vec3(0.0, 0.0, 1.0)));
+          float rim = 1.0 - exp(-cosA * 4.5);
+
+          float nBias = clamp( vNormal.y, 0.0, 1.0);
+          float wBias = clamp(-vNormal.x, 0.0, 1.0);
+          float dirFactor = mix(0.05, 1.0, nBias * 0.65 + wBias * 0.35);
+
+          float alpha = rim * dirFactor * 1.5;
+          gl_FragColor = vec4(0.5, 0.7, 1.0, alpha);
+        }
+      `,
+      side: THREE.BackSide,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+    });
+    this.scene.add(new THREE.Mesh(geo2, mat2));
+  }
 
   private monitorFps(now: number): void {
     this.fpsMonitor.frameCount++;
@@ -217,10 +334,12 @@ export class GlobeRenderer {
       this.fpsMonitor.frameCount = 0;
       this.fpsMonitor.lastTime = now;
 
-      if (this.fpsMonitor.fps < 55 && this.fpsMonitor.level < 3) {
+      if (this.fpsMonitor.fps < 45 && this.fpsMonitor.level < 2) {
         this.fpsMonitor.level++;
-        const reduction = 1 - this.fpsMonitor.level * 0.2;
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2) * reduction);
+        const reduction = 1 - this.fpsMonitor.level * 0.1;
+        this.renderer.setPixelRatio(
+          Math.min(window.devicePixelRatio, 2) * reduction,
+        );
       }
     }
   }
@@ -231,20 +350,36 @@ export class GlobeRenderer {
 
     const tick = (now: number) => {
       this.animId = requestAnimationFrame(tick);
+
+      if (this.pendingSize) {
+        this.flushSize(this.pendingSize.w, this.pendingSize.h);
+        this.pendingSize = null;
+      }
+
       this.monitorFps(now);
 
       rotY += 0.0008;
+      this.globe.rotation.x = GLOBE_TILT_X;
       this.globe.rotation.y = rotY;
+      this.dots.rotation.x = GLOBE_TILT_X;
       this.dots.rotation.y = rotY;
 
-      // Animate satellite positions along orbits
+      // Smooth satellite animation — lerp between orbit steps
       for (const child of this.satDots.children) {
         const mesh = child as THREE.Mesh;
-        const pts = mesh.userData['orbitPoints'] as Vec3[];
-        const idx = (mesh.userData['orbitIndex'] as number + 1) % pts.length;
-        mesh.userData['orbitIndex'] = idx;
-        const [x, y, z] = pts[idx]!;
-        mesh.position.set(x, y, z);
+        const pts = mesh.userData["orbitPoints"] as Vec3[];
+        const prog = (mesh.userData["orbitProgress"] as number) + 1 / 10;
+        mesh.userData["orbitProgress"] = prog;
+        const i0 = Math.floor(prog) % pts.length;
+        const i1 = (i0 + 1) % pts.length;
+        const frac = prog - Math.floor(prog);
+        const p0 = pts[i0]!;
+        const p1 = pts[i1]!;
+        mesh.position.set(
+          p0[0] + (p1[0] - p0[0]) * frac,
+          p0[1] + (p1[1] - p0[1]) * frac,
+          p0[2] + (p1[2] - p0[2]) * frac,
+        );
       }
 
       this.renderer.render(this.scene, this.camera);
