@@ -10,6 +10,8 @@
     src="/globe-snapshot.webp"
     aria-hidden="true"
     alt=""
+    fetchpriority="high"
+    decoding="async"
   />
   <canvas class="globe-canvas" id="globe-canvas" style="opacity:0"></canvas>
 </div>
@@ -54,7 +56,7 @@
     const { GlobeRenderer } = await import('./globe/GlobeRenderer');
 
     const renderer = new GlobeRenderer(canvas);
-    await renderer.loadWorldMap('/world.png').catch(() => {});
+    await renderer.loadWorldMap('/world.webp').catch(() => {});
     renderer.buildOrbits();
     renderer.start();
     window.addEventListener('beforeunload', () => renderer.destroy(), { once: true });
