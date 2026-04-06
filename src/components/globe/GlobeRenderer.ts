@@ -260,71 +260,33 @@ export class GlobeRenderer {
   }
 
   private addAtmosphere(): void {
-    const geo = new THREE.SphereGeometry(GLOBE_RADIUS * 1.1, 32, 32);
+    // Flat plane facing the camera — no sphere geometry boundary.
+    // Glow computed as radial gradient from globe center; depth test hides
+    // the portion behind the globe. Plane is large enough that its edges
+    // are never reached by the visible glow.
     const mat = new THREE.ShaderMaterial({
       vertexShader: `
-        varying vec3 vNormal;
+        varying vec3 vWorldPos;
         void main() {
-          vNormal = normalize(normalMatrix * normal);
+          vWorldPos = position;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
       fragmentShader: `
-        varying vec3 vNormal;
+        varying vec3 vWorldPos;
         void main() {
-          // Classic rim-light atmosphere: bright at outer silhouette (cosA=0),
-          // fades to 0 at inner boundary (~cosA=0.7, occluded by globe).
-          float cosA = abs(dot(vNormal, vec3(0.0, 0.0, 1.0)));
-          float rim = 1.0 - exp(-cosA * 3.0);
-
-          // Directional bias (outward normals, no BackSide flip):
-          //   top  → vNormal.y = +1  → use  vNormal.y
-          //   left → vNormal.x = -1  → use -vNormal.x
-          float nBias = clamp( vNormal.y, 0.0, 1.0);
-          float wBias = clamp(-vNormal.x, 0.0, 1.0);
-          float dirFactor = mix(0.05, 1.0, nBias * 0.65 + wBias * 0.35);
-
-          float alpha = rim * dirFactor * 0.9;
+          float r = length(vWorldPos.xy);
+          float glow = exp(-max(r - 0.95, 0.0) * 7.0);
+          float alpha = glow * 0.85;
+          if (alpha < 0.002) discard;
           gl_FragColor = vec4(0.35, 0.58, 1.0, alpha);
         }
       `,
-      side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
       transparent: true,
       depthWrite: false,
     });
-    this.scene.add(new THREE.Mesh(geo, mat));
-
-    // Thin bright rim — tighter falloff, higher alpha
-    const geo2 = new THREE.SphereGeometry(GLOBE_RADIUS * 1.04, 32, 32);
-    const mat2 = new THREE.ShaderMaterial({
-      vertexShader: `
-        varying vec3 vNormal;
-        void main() {
-          vNormal = normalize(normalMatrix * normal);
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-        }
-      `,
-      fragmentShader: `
-        varying vec3 vNormal;
-        void main() {
-          float cosA = abs(dot(vNormal, vec3(0.0, 0.0, 1.0)));
-          float rim = 1.0 - exp(-cosA * 4.5);
-
-          float nBias = clamp( vNormal.y, 0.0, 1.0);
-          float wBias = clamp(-vNormal.x, 0.0, 1.0);
-          float dirFactor = mix(0.05, 1.0, nBias * 0.65 + wBias * 0.35);
-
-          float alpha = rim * dirFactor * 1.5;
-          gl_FragColor = vec4(0.5, 0.7, 1.0, alpha);
-        }
-      `,
-      side: THREE.BackSide,
-      blending: THREE.AdditiveBlending,
-      transparent: true,
-      depthWrite: false,
-    });
-    this.scene.add(new THREE.Mesh(geo2, mat2));
+    this.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(14, 14), mat));
   }
 
   private monitorFps(now: number): void {
