@@ -1,0 +1,110 @@
+<h2>Внешний край рассеянный, внутренний — чёткий</h2>
+<p class="subtitle">Три варианта экспоненциального затухания наружу. Выбери интенсивность.</p>
+
+<div class="cards" style="gap:20px">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="ca" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">1 - exp(-cosA × 6)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Мягкий</h3>
+      <p>Широкое мягкое свечение, постепенно рассеивается наружу</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="cb" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">1 - exp(-cosA × 12)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Средний (рек.)</h3>
+      <p>Чёткое свечение у поверхности, быстро рассеивается — похоже на реальную атмосферу</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="cc" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">1 - exp(-cosA × 20)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Резкий</h3>
+      <p>Очень тонкий чёткий ореол у поверхности, почти нет свечения снаружи</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const BG = '#0a0e14';
+  const W = 200, H = 200, cx = W/2, cy = H/2;
+  const R_GLOBE = 60, R_ATMO = 86;
+
+  function drawAtmo(ctx, alphaFn) {
+    const id = ctx.createImageData(W, H);
+    const d = id.data;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const dx = x - cx, dy = y - cy;
+        const r = Math.sqrt(dx*dx + dy*dy);
+        if (r > R_ATMO || r < R_GLOBE) continue;
+        // t=0 → inner (near globe), t=1 → outer (silhouette)
+        const t = (r - R_GLOBE) / (R_ATMO - R_GLOBE);
+        // cosA: outer edge → 0, inner edge → 0.85
+        const cosA = (1.0 - t) * 0.85;
+        const alpha = Math.min(Math.max(alphaFn(cosA), 0), 1);
+        if (alpha <= 0.004) continue;
+        const i = (y * W + x) * 4;
+        d[i]   = 90;
+        d[i+1] = 150;
+        d[i+2] = 255;
+        d[i+3] = Math.round(alpha * 255);
+      }
+    }
+    ctx.putImageData(id, 0, 0);
+  }
+
+  function drawGlobe(ctx) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R_GLOBE, 0, Math.PI*2);
+    ctx.fillStyle = '#0d1420';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    for(let i=0;i<80;i++){
+      const a = (i * 2.399963) % (Math.PI*2);
+      const r2 = R_GLOBE * Math.sqrt((i+1)/80) * 0.92;
+      ctx.beginPath();
+      ctx.arc(cx + r2*Math.cos(a), cy + r2*Math.sin(a), 1.2, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // A — soft: 1 - exp(-cosA * 6)
+  const ctxa = document.getElementById('ca').getContext('2d');
+  ctxa.fillStyle = BG; ctxa.fillRect(0,0,W,H);
+  drawAtmo(ctxa, cosA => (1.0 - Math.exp(-cosA * 6.0)) * 0.85);
+  drawGlobe(ctxa);
+
+  // B — medium: 1 - exp(-cosA * 12)
+  const ctxb = document.getElementById('cb').getContext('2d');
+  ctxb.fillStyle = BG; ctxb.fillRect(0,0,W,H);
+  drawAtmo(ctxb, cosA => (1.0 - Math.exp(-cosA * 12.0)) * 0.85);
+  drawGlobe(ctxb);
+
+  // C — sharp: 1 - exp(-cosA * 20)
+  const ctxc = document.getElementById('cc').getContext('2d');
+  ctxc.fillStyle = BG; ctxc.fillRect(0,0,W,H);
+  drawAtmo(ctxc, cosA => (1.0 - Math.exp(-cosA * 20.0)) * 0.85);
+  drawGlobe(ctxc);
+})();
+</script>

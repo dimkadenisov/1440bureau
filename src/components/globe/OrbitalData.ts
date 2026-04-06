@@ -16,14 +16,19 @@ export function latLonToVector3(lat: number, lon: number, radius = 1): Vec3 {
   const theta = (lon + 180) * (Math.PI / 180);
   return [
     -radius * Math.sin(phi) * Math.cos(theta),
-     radius * Math.cos(phi),
-     radius * Math.sin(phi) * Math.sin(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta),
   ];
 }
 
 /** Generate orbital ring points in 3D space.
  *  Returns array of Vec3 at (1 + altitudeKm/EARTH_R) radius. */
-export function generateOrbit({ altitudeKm, inclinationDeg, raanDeg, steps }: OrbitalParams): Vec3[] {
+export function generateOrbit({
+  altitudeKm,
+  inclinationDeg,
+  raanDeg,
+  steps,
+}: OrbitalParams): Vec3[] {
   const r = 1 + altitudeKm / EARTH_RADIUS_KM;
   const inc = inclinationDeg * (Math.PI / 180);
   const raan = raanDeg * (Math.PI / 180);
@@ -53,7 +58,12 @@ export function generateOrbit({ altitudeKm, inclinationDeg, raanDeg, steps }: Or
 
 /** Generate arc points between two Vec3 points on a sphere,
  *  elevating the midpoint by `arcHeight` for a parabolic arc effect. */
-export function generateArcPoints(start: Vec3, end: Vec3, arcHeight: number, steps: number): Vec3[] {
+export function generateArcPoints(
+  start: Vec3,
+  end: Vec3,
+  arcHeight: number,
+  steps: number,
+): Vec3[] {
   const points: Vec3[] = [];
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
@@ -64,21 +74,26 @@ export function generateArcPoints(start: Vec3, end: Vec3, arcHeight: number, ste
     // Normalise and add arc height (sin curve peaks at midpoint)
     const len = Math.sqrt(x * x + y * y + z * z);
     const elevation = 1 + arcHeight * Math.sin(Math.PI * t);
-    points.push([x / len * elevation, y / len * elevation, z / len * elevation]);
+    points.push([
+      (x / len) * elevation,
+      (y / len) * elevation,
+      (z / len) * elevation,
+    ]);
   }
   return points;
 }
 
-/** Six Rassvet satellites — simulated orbital parameters.
- *  Rassvet-1: 3 sats at 550 km, ~97.5° SSO
- *  Rassvet-2: 3 sats at 800 km, ~98.6° SSO */
+/** Six Rassvet satellites — visually optimized orbital parameters.
+ *  Altitudes match real missions; inclinations tuned for clear ellipsoidal
+ *  appearance when viewed from z-axis (60-70° gives 2:1 – 3:1 aspect ratio).
+ *  Rassvet-1: 550 km, Rassvet-2: 800 km */
 export const SATELLITES = [
-  // Rassvet-1 (550 km SSO)
-  { name: 'R1-A', altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 0 },
-  { name: 'R1-B', altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 120 },
-  { name: 'R1-C', altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 240 },
-  // Rassvet-2 (800 km SSO)
-  { name: 'R2-A', altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 60 },
-  { name: 'R2-B', altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 180 },
-  { name: 'R2-C', altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 300 },
+  // Rassvet-1 (550 km) — 60° inclination, RAAN 0 / 120 / 240
+  { name: "R1-A", altitudeKm: 550, inclinationDeg: 60, raanDeg: 0 },
+  { name: "R1-B", altitudeKm: 550, inclinationDeg: 60, raanDeg: 120 },
+  { name: "R1-C", altitudeKm: 550, inclinationDeg: 60, raanDeg: 240 },
+  // Rassvet-2 (800 km) — 70° inclination, RAAN 60 / 180 / 300
+  { name: "R2-A", altitudeKm: 800, inclinationDeg: 70, raanDeg: 60 },
+  { name: "R2-B", altitudeKm: 800, inclinationDeg: 70, raanDeg: 180 },
+  { name: "R2-C", altitudeKm: 800, inclinationDeg: 70, raanDeg: 300 },
 ] as const;

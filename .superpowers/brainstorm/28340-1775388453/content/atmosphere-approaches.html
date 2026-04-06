@@ -1,0 +1,135 @@
+<h2>Три подхода к затуханию атмосферы</h2>
+<p class="subtitle">Каждый вариант — живой рендер. Выбери понравившийся.</p>
+
+<div class="cards" style="gap:20px">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)" style="min-width:180px">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="ca" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">pow(max(...), 2.0)</code> — текущий
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — Текущий</h3>
+      <p>Линейный рамп + pow(2). Гладкий, но падает до 0 с ненулевым наклоном — видна граница.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)" style="min-width:180px">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="cb" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">smoothstep(0.75, 0.0, cosA)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — Smoothstep</h3>
+      <p>S-кривая: производная = 0 на краях. Плавно уходит в прозрачность без видимой границы.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)" style="min-width:180px">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="cc" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">exp(-cosA * 4.0)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — Экспоненциальный</h3>
+      <p>Физически точный закон рассеивания. Нет жёстких граней вообще — плавно на всём диапазоне.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const BG = '#0a0e14';
+  const ATMO_COLOR = [90, 150, 255];
+  const W = 200, H = 200, cx = W/2, cy = H/2;
+  const R_GLOBE = 60, R_ATMO = 86;
+
+  // Helper: draw atmosphere using a per-pixel alpha function of cosA
+  function drawAtmo(ctx, alphaFn) {
+    const id = ctx.createImageData(W, H);
+    const d = id.data;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const dx = x - cx, dy = y - cy;
+        const r = Math.sqrt(dx*dx + dy*dy);
+        if (r > R_ATMO || r < R_GLOBE) continue;
+        // Approximate cosA from shell geometry (BackSide equivalent)
+        // cosA = abs(dot(normal, viewDir)) where viewDir=(0,0,1)
+        // On a sphere shell, cosA can be approximated as sqrt(1 - (r_xy/R_ATMO)^2)
+        // but for rim effect: cosA is small at outer edge, larger inward
+        // Map r: R_GLOBE..R_ATMO → cosA: ~0.85..0
+        const t = (r - R_GLOBE) / (R_ATMO - R_GLOBE); // 0=inner, 1=outer
+        const cosA = (1.0 - t) * 0.85; // outer edge → cosA≈0, inner → cosA≈0.85
+        const alpha = alphaFn(cosA);
+        if (alpha <= 0) continue;
+        const i = (y * W + x) * 4;
+        const a = Math.min(alpha, 1.0);
+        d[i]   = ATMO_COLOR[0];
+        d[i+1] = ATMO_COLOR[1];
+        d[i+2] = ATMO_COLOR[2];
+        d[i+3] = Math.round(a * 255);
+      }
+    }
+    ctx.putImageData(id, 0, 0);
+  }
+
+  function drawGlobe(ctx) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R_GLOBE, 0, Math.PI*2);
+    ctx.fillStyle = '#0d1420';
+    ctx.fill();
+    // dots
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    const seed = 42;
+    for(let i=0;i<80;i++){
+      const a = (i * 2.399963) % (Math.PI*2);
+      const r2 = R_GLOBE * Math.sqrt((i+1)/80) * 0.92;
+      ctx.beginPath();
+      ctx.arc(cx + r2*Math.cos(a), cy + r2*Math.sin(a), 1.2, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  // clamp helper
+  function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+
+  // A — current: pow(max(1 - cosA/0.75, 0), 2) * 0.9
+  const ctxa = document.getElementById('ca').getContext('2d');
+  ctxa.fillStyle = BG; ctxa.fillRect(0,0,W,H);
+  drawAtmo(ctxa, cosA => {
+    const rim = Math.pow(Math.max(1.0 - cosA/0.75, 0.0), 2.0);
+    const nBias = clamp(cosA * 0.5, 0, 1); // simplified dirFactor
+    return rim * 0.9;
+  });
+  drawGlobe(ctxa);
+
+  // B — smoothstep
+  function smoothstep(edge0, edge1, x) {
+    const t = clamp((x - edge0) / (edge1 - edge0), 0, 1);
+    return t * t * (3 - 2*t);
+  }
+  const ctxb = document.getElementById('cb').getContext('2d');
+  ctxb.fillStyle = BG; ctxb.fillRect(0,0,W,H);
+  drawAtmo(ctxb, cosA => {
+    const rim = Math.pow(smoothstep(0.75, 0.0, cosA), 2.0);
+    return rim * 0.9;
+  });
+  drawGlobe(ctxb);
+
+  // C — exponential
+  const ctxc = document.getElementById('cc').getContext('2d');
+  ctxc.fillStyle = BG; ctxc.fillRect(0,0,W,H);
+  drawAtmo(ctxc, cosA => {
+    const rim = Math.exp(-cosA * 4.5) * (1.0 - Math.exp(-cosA * 20));
+    return rim * 1.8;
+  });
+  drawGlobe(ctxc);
+})();
+</script>

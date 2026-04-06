@@ -1,0 +1,105 @@
+<h2>Ещё мягче</h2>
+<p class="subtitle">Широкое рассеивание, почти без видимой границы снаружи</p>
+
+<div class="cards" style="gap:20px">
+
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="ca" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">1 - exp(-cosA × 3)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A — k=3</h3>
+      <p>Очень широкое облако свечения, мягко тает наружу</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="cb" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">1 - exp(-cosA × 1.5)</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B — k=1.5</h3>
+      <p>Равномерный градиент от поверхности, почти линейный</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="background:#0a0e14;padding:16px 12px">
+      <canvas id="cc" width="200" height="200" style="display:block;margin:0 auto"></canvas>
+      <div style="margin-top:8px;font-size:11px;color:#64748b;text-align:center">
+        <code style="color:#94a3b8">cosA ^ 0.5</code>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C — sqrt(cosA)</h3>
+      <p>Степенной закон: резко нарастает у поверхности, широко рассеивается — как туман</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function() {
+  const BG = '#0a0e14';
+  const W = 200, H = 200, cx = W/2, cy = H/2;
+  const R_GLOBE = 60, R_ATMO = 90;
+
+  function drawAtmo(ctx, alphaFn) {
+    const id = ctx.createImageData(W, H);
+    const d = id.data;
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const dx = x - cx, dy = y - cy;
+        const r = Math.sqrt(dx*dx + dy*dy);
+        if (r > R_ATMO || r < R_GLOBE) continue;
+        const t = (r - R_GLOBE) / (R_ATMO - R_GLOBE);
+        const cosA = (1.0 - t) * 0.85;
+        const alpha = Math.min(Math.max(alphaFn(cosA), 0), 1);
+        if (alpha <= 0.004) continue;
+        const i = (y * W + x) * 4;
+        d[i]   = 90;
+        d[i+1] = 150;
+        d[i+2] = 255;
+        d[i+3] = Math.round(alpha * 255);
+      }
+    }
+    ctx.putImageData(id, 0, 0);
+  }
+
+  function drawGlobe(ctx) {
+    ctx.beginPath();
+    ctx.arc(cx, cy, R_GLOBE, 0, Math.PI*2);
+    ctx.fillStyle = '#0d1420';
+    ctx.fill();
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    for(let i=0;i<80;i++){
+      const a = (i * 2.399963) % (Math.PI*2);
+      const r2 = R_GLOBE * Math.sqrt((i+1)/80) * 0.92;
+      ctx.beginPath();
+      ctx.arc(cx + r2*Math.cos(a), cy + r2*Math.sin(a), 1.2, 0, Math.PI*2);
+      ctx.fill();
+    }
+  }
+
+  const ctxa = document.getElementById('ca').getContext('2d');
+  ctxa.fillStyle = BG; ctxa.fillRect(0,0,W,H);
+  drawAtmo(ctxa, cosA => (1.0 - Math.exp(-cosA * 3.0)) * 0.85);
+  drawGlobe(ctxa);
+
+  const ctxb = document.getElementById('cb').getContext('2d');
+  ctxb.fillStyle = BG; ctxb.fillRect(0,0,W,H);
+  drawAtmo(ctxb, cosA => (1.0 - Math.exp(-cosA * 1.5)) * 0.85);
+  drawGlobe(ctxb);
+
+  const ctxc = document.getElementById('cc').getContext('2d');
+  ctxc.fillStyle = BG; ctxc.fillRect(0,0,W,H);
+  drawAtmo(ctxc, cosA => Math.pow(cosA / 0.85, 0.5) * 0.85);
+  drawGlobe(ctxc);
+})();
+</script>

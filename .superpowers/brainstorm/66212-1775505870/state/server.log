@@ -1,0 +1,6 @@
+{"type":"server-started","port":56170,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:56170","screen_dir":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/66212-1775505870/content","state_dir":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/66212-1775505870/state"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/66212-1775505870/content/atmosphere-3d-compare.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/66212-1775505870/content/atmosphere-disc.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/66212-1775505870/content/atmosphere-radial.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/66212-1775505870/content/atmosphere-thin.html"}
+{"type":"server-stopped","reason":"idle timeout"}

@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin:0; background:#0a0e14; font-family: system-ui, sans-serif; color:#e2e8f0; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:24px; padding:24px; }
+  .item { text-align:center; }
+  canvas { width:100%; border-radius:8px; display:block; }
+  h2 { font-size:14px; margin:10px 0 4px; color:#94a3b8; }
+  p { font-size:12px; color:#64748b; margin:0 0 8px; }
+  .title { text-align:center; padding:24px 24px 0; font-size:20px; font-weight:600; }
+  .sub { text-align:center; padding:4px 24px 0; font-size:13px; color:#64748b; }
+</style>
+</head>
+<body>
+<div class="title">Варианты атмосферы — реальный рендер</div>
+<div class="sub">Выбери понравившийся и напиши букву в терминале</div>
+<div class="grid">
+  <div class="item">
+    <canvas id="a" width="320" height="320"></canvas>
+    <h2>A — Текущий (после правок)</h2>
+    <p>Два слоя, внутренний 1.04r даёт кольцо</p>
+  </div>
+  <div class="item">
+    <canvas id="b" width="320" height="320"></canvas>
+    <h2>B — Один широкий слой, 1.3r</h2>
+    <p>Убрал внутренний слой, расширил внешний</p>
+  </div>
+  <div class="item">
+    <canvas id="c" width="320" height="320"></canvas>
+    <h2>C — Колокол, 1.4r</h2>
+    <p>Нет резких краёв — гало плавно тает с обеих сторон</p>
+  </div>
+</div>
+
+<script type="importmap">
+  {"imports":{"three":"https://unpkg.com/three@0.161.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+function makeRenderer(canvas) {
+  const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  r.setPixelRatio(Math.min(devicePixelRatio, 2));
+  r.setSize(320, 320, false);
+  r.setClearColor(0x0a0e14, 1);
+  return r;
+}
+
+function makeScene() {
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.z = 3.2;
+  return { scene, camera };
+}
+
+function makeGlobe(scene) {
+  const g = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 48, 48),
+    new THREE.MeshBasicMaterial({ color: 0x0d1420 })
+  );
+  g.rotation.x = 0.35;
+  scene.add(g);
+  return g;
+}
+
+const VS = `varying vec3 vNormal;
+void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
+
+function atmoMat(fs, additive=true) {
+  return new THREE.ShaderMaterial({
+    vertexShader: VS, fragmentShader: fs,
+    side: THREE.BackSide,
+    blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending,
+    transparent: true, depthWrite: false
+  });
+}
+
+function dirFactor() {
+  return `
+  float nBias=clamp(vNormal.y,0.,1.);
+  float wBias=clamp(-vNormal.x,0.,1.);
+  float dirFactor=mix(0.05,1.,nBias*.65+wBias*.35);`;
+}
+
+// ── A: current — two layers ──
+{
+  const {scene,camera}=makeScene();
+  const globe=makeGlobe(scene);
+
+  // outer 1.1
+  const fs1=`varying vec3 vNormal;void main(){
+    float cosA=abs(dot(vNormal,vec3(0,0,1)));
+    float rim=1.-exp(-cosA*3.);
+    ${dirFactor()}
+    float alpha=rim*dirFactor*.9;
+    gl_FragColor=vec4(.35,.58,1.,alpha);}`;
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.1,32,32),atmoMat(fs1)));
+
+  // inner 1.04
+  const fs2=`varying vec3 vNormal;void main(){
+    float cosA=abs(dot(vNormal,vec3(0,0,1)));
+    float rim=1.-exp(-cosA*4.5);
+    ${dirFactor()}
+    float alpha=rim*dirFactor*1.5;
+    gl_FragColor=vec4(.5,.7,1.,alpha);}`;
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.04,32,32),atmoMat(fs2)));
+
+  const renderer=makeRenderer(document.getElementById('a'));
+  let ry=0;
+  (function tick(){requestAnimationFrame(tick);ry+=.004;globe.rotation.y=ry;renderer.render(scene,camera);})();
+}
+
+// ── B: single wide layer, 1.3r, k=2 ──
+{
+  const {scene,camera}=makeScene();
+  const globe=makeGlobe(scene);
+
+  const fs=`varying vec3 vNormal;void main(){
+    float cosA=abs(dot(vNormal,vec3(0,0,1)));
+    float rim=1.-exp(-cosA*2.);
+    ${dirFactor()}
+    float alpha=rim*dirFactor*.9;
+    gl_FragColor=vec4(.35,.58,1.,alpha);}`;
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.3,32,32),atmoMat(fs)));
+
+  const renderer=makeRenderer(document.getElementById('b'));
+  let ry=0;
+  (function tick(){requestAnimationFrame(tick);ry+=.004;globe.rotation.y=ry;renderer.render(scene,camera);})();
+}
+
+// ── C: bell curve, 1.4r — smooth both edges ──
+{
+  const {scene,camera}=makeScene();
+  const globe=makeGlobe(scene);
+
+  // sin bell: 0 at cosA=0 (outer), max at middle, 0 at cosA_max (inner)
+  // cosA_max for 1.4r: sqrt(1.96-1)/1.4 ≈ 0.70
+  const fs=`varying vec3 vNormal;void main(){
+    float cosA=abs(dot(vNormal,vec3(0,0,1)));
+    float cosMax=0.70;
+    float t=clamp(cosA/cosMax,0.,1.);
+    float rim=sin(t*3.14159);
+    ${dirFactor()}
+    float alpha=rim*dirFactor*1.1;
+    gl_FragColor=vec4(.35,.58,1.,alpha);}`;
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1.4,32,32),atmoMat(fs)));
+
+  const renderer=makeRenderer(document.getElementById('c'));
+  let ry=0;
+  (function tick(){requestAnimationFrame(tick);ry+=.004;globe.rotation.y=ry;renderer.render(scene,camera);})();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  body { margin:0; background:#0a0e14; font-family: system-ui, sans-serif; color:#e2e8f0; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:20px; padding:24px; max-width:900px; margin:0 auto; }
+  .item { text-align:center; }
+  canvas { width:100%; border-radius:8px; display:block; }
+  h2 { font-size:13px; margin:10px 0 4px; color:#94a3b8; }
+  p { font-size:11px; color:#64748b; margin:0; }
+  .title { text-align:center; padding:24px 24px 4px; font-size:20px; font-weight:600; }
+  .sub { text-align:center; padding:0 24px 8px; font-size:13px; color:#64748b; }
+</style>
+</head>
+<body>
+<div class="title">Радиальный градиент — три интенсивности</div>
+<div class="sub">Плоский прямоугольник, равномерное свечение, нет границ. Напиши A, B или C в терминале.</div>
+<div class="grid">
+  <div class="item">
+    <canvas id="a" width="280" height="280"></canvas>
+    <h2>A — мягкий</h2>
+    <p>exp × 1.5, широкое свечение</p>
+  </div>
+  <div class="item">
+    <canvas id="b" width="280" height="280"></canvas>
+    <h2>B — средний</h2>
+    <p>exp × 2.5, баланс</p>
+  </div>
+  <div class="item">
+    <canvas id="c" width="280" height="280"></canvas>
+    <h2>C — плотный</h2>
+    <p>exp × 4.0, плотнее к поверхности</p>
+  </div>
+</div>
+
+<script type="importmap">
+  {"imports":{"three":"https://unpkg.com/three@0.161.0/build/three.module.js"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+
+const VS = `varying vec3 vWorldPos;
+void main(){
+  vWorldPos = position;
+  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+function makeGlobe(id, k, opacity) {
+  const canvas = document.getElementById(id);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(280, 280, false);
+  renderer.setClearColor(0x0a0e14, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+  camera.position.z = 3.2;
+
+  // Globe
+  const globe = new THREE.Mesh(
+    new THREE.SphereGeometry(1, 48, 48),
+    new THREE.MeshBasicMaterial({ color: 0x0d1420 })
+  );
+  globe.rotation.x = 0.35;
+  scene.add(globe);
+
+  // Dots on globe (simplified)
+  const dotGeo = new THREE.SphereGeometry(1.001, 32, 32);
+  const dotMat = new THREE.PointsMaterial({ color: 0x334155, size: 0.015, sizeAttenuation: true });
+  const dots = new THREE.Points(dotGeo, dotMat);
+  dots.rotation.x = 0.35;
+  scene.add(dots);
+
+  // Atmosphere: large plane, radial gradient, no boundary
+  const fs = `
+    varying vec3 vWorldPos;
+    void main() {
+      float r = length(vWorldPos.xy);
+      float glow = exp(-max(r - 0.95, 0.0) * ${k.toFixed(1)});
+      float alpha = glow * ${opacity.toFixed(2)};
+      if (alpha < 0.002) discard;
+      gl_FragColor = vec4(0.35, 0.58, 1.0, alpha);
+    }
+  `;
+
+  const plane = new THREE.Mesh(
+    new THREE.PlaneGeometry(14, 14),
+    new THREE.ShaderMaterial({
+      vertexShader: VS,
+      fragmentShader: fs,
+      blending: THREE.AdditiveBlending,
+      transparent: true,
+      depthWrite: false,
+    })
+  );
+  scene.add(plane);
+
+  let ry = 0;
+  (function tick() {
+    requestAnimationFrame(tick);
+    ry += 0.004;
+    globe.rotation.y = ry;
+    dots.rotation.y = ry;
+    renderer.render(scene, camera);
+  })();
+}
+
+makeGlobe('a', 1.5, 0.55);
+makeGlobe('b', 2.5, 0.65);
+makeGlobe('c', 4.0, 0.75);
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{"type":"server-started","port":55587,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:55587","screen_dir":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content","state_dir":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/state"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content/atmosphere-problem.html"}
+{"source":"user-event","type":"click","text":"B\n    \n      Слишком резкое затухание\n      Свечение обрывается резко — нет плавного перехода к прозрачному","choice":"b","id":null,"timestamp":1775388576819}
+{"source":"user-event","type":"click","text":"B\n    \n      Слишком резкое затухание\n      Свечение обрывается резко — нет плавного перехода к прозрачному","choice":"b","id":null,"timestamp":1775388594747}
+{"source":"user-event","type":"click","text":"B\n    \n      Слишком резкое затухание\n      Свечение обрывается резко — нет плавного перехода к прозрачному","choice":"b","id":null,"timestamp":1775388594861}
+{"source":"user-event","type":"click","text":"B\n    \n      Слишком резкое затухание\n      Свечение обрывается резко — нет плавного перехода к прозрачному","choice":"b","id":null,"timestamp":1775388595841}
+{"source":"user-event","type":"click","text":"B\n    \n      Слишком резкое затухание\n      Свечение обрывается резко — нет плавного перехода к прозрачному","choice":"b","id":null,"timestamp":1775388596285}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content/atmosphere-approaches.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content/atmosphere-inverted.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content/atmosphere-softer.html"}
+{"source":"user-event","type":"click","text":"1 - exp(-cosA × 3)\n      \n    \n    \n      A — k=3\n      Очень широкое облако свечения, мягко тает наружу","choice":"a","id":null,"timestamp":1775389010644}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content/waiting.html"}
+{"type":"screen-added","file":"/Users/fatality/work/1440bureau/.superpowers/brainstorm/28340-1775388453/content/atmosphere-3d-compare.html"}
+{"type":"server-stopped","reason":"idle timeout"}

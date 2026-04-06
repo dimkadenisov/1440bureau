@@ -1,0 +1,103 @@
+<h2>Где именно резкий край?</h2>
+<p class="subtitle">Нажми на вариант, который ближе всего к тому, что ты видишь сейчас</p>
+
+<div class="options">
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Жёсткое кольцо по внешней границе</h3>
+      <p>Видна геометрия сферы атмосферы — по краям чёткий круг, будто обрезан</p>
+      <div style="margin-top:12px">
+        <canvas id="ca" width="200" height="200" style="display:block;margin:0 auto;border-radius:4px;background:#0a0e14"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B</div>
+    <div class="content">
+      <h3>Слишком резкое затухание</h3>
+      <p>Свечение обрывается резко — нет плавного перехода к прозрачному</p>
+      <div style="margin-top:12px">
+        <canvas id="cb" width="200" height="200" style="display:block;margin:0 auto;border-radius:4px;background:#0a0e14"></canvas>
+      </div>
+    </div>
+  </div>
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Оба варианта</h3>
+      <p>И внешний край жёсткий, и свечение обрывается резко</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// Draw atmosphere cross-section simulations
+(function() {
+  // Option A: hard outer ring (geometry boundary visible)
+  const ca = document.getElementById('ca');
+  const ctxa = ca.getContext('2d');
+  const cx = 100, cy = 100;
+
+  // Globe
+  ctxa.beginPath();
+  ctxa.arc(cx, cy, 55, 0, Math.PI*2);
+  ctxa.fillStyle = '#0d1420';
+  ctxa.fill();
+
+  // Outer atmosphere — hard edge: full alpha right up to geometry boundary
+  const ga = ctxa.createRadialGradient(cx, cy, 55, cx, cy, 82);
+  ga.addColorStop(0, 'rgba(90,150,255,0)');
+  ga.addColorStop(0.7, 'rgba(90,150,255,0.5)');
+  ga.addColorStop(0.98, 'rgba(90,150,255,0.7)');
+  ga.addColorStop(1.0, 'rgba(90,150,255,0)'); // but actual sphere clips here — looks hard
+  ctxa.beginPath();
+  ctxa.arc(cx, cy, 82, 0, Math.PI*2);
+  ctxa.fillStyle = ga;
+  ctxa.fill();
+
+  // Simulate hard clipping circle
+  ctxa.beginPath();
+  ctxa.arc(cx, cy, 82, 0, Math.PI*2);
+  ctxa.strokeStyle = 'rgba(90,150,255,0.5)';
+  ctxa.lineWidth = 2;
+  ctxa.stroke();
+
+  // Dots on globe
+  ctxa.fillStyle = 'rgba(255,255,255,0.15)';
+  for(let i=0;i<60;i++){
+    const a=Math.random()*Math.PI*2, r=50*Math.sqrt(Math.random());
+    ctxa.beginPath(); ctxa.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),1,0,Math.PI*2); ctxa.fill();
+  }
+
+  // Option B: sharp falloff (glow cuts off abruptly partway)
+  const cb = document.getElementById('cb');
+  const ctxb = cb.getContext('2d');
+
+  // Globe
+  ctxb.beginPath();
+  ctxb.arc(cx, cy, 55, 0, Math.PI*2);
+  ctxb.fillStyle = '#0d1420';
+  ctxb.fill();
+
+  // Atmosphere with abrupt cutoff (harsh drop from bright to nothing)
+  const gb = ctxb.createRadialGradient(cx, cy, 55, cx, cy, 82);
+  gb.addColorStop(0, 'rgba(90,150,255,0)');
+  gb.addColorStop(0.3, 'rgba(90,150,255,0)');
+  gb.addColorStop(0.75, 'rgba(90,150,255,0.8)'); // stays bright...
+  gb.addColorStop(0.85, 'rgba(90,150,255,0.75)'); // ...then sharp cut
+  gb.addColorStop(0.86, 'rgba(90,150,255,0)');    // hard stop
+  gb.addColorStop(1.0, 'rgba(90,150,255,0)');
+  ctxb.beginPath();
+  ctxb.arc(cx, cy, 82, 0, Math.PI*2);
+  ctxb.fillStyle = gb;
+  ctxb.fill();
+
+  // Dots on globe
+  ctxb.fillStyle = 'rgba(255,255,255,0.15)';
+  for(let i=0;i<60;i++){
+    const a=Math.random()*Math.PI*2, r=50*Math.sqrt(Math.random());
+    ctxb.beginPath(); ctxb.arc(cx+r*Math.cos(a),cy+r*Math.sin(a),1,0,Math.PI*2); ctxb.fill();
+  }
+})();
+</script>
