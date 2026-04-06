@@ -276,7 +276,7 @@ export class GlobeRenderer {
         varying vec3 vWorldPos;
         void main() {
           float r = length(vWorldPos.xy);
-          float glow = exp(-max(r - 0.95, 0.0) * 7.0);
+          float glow = exp(-max(r - 0.95, 0.0) * 18.0);
           float alpha = glow * 0.85;
           if (alpha < 0.002) discard;
           gl_FragColor = vec4(0.35, 0.58, 1.0, alpha);
