@@ -277,7 +277,13 @@ export class GlobeRenderer {
         void main() {
           float r = length(vWorldPos.xy);
           float glow = exp(-max(r - 0.95, 0.0) * 18.0);
-          float alpha = glow * 0.85;
+          // Directional bias: bright top-left, dim bottom-right
+          float ny = r > 0.01 ? vWorldPos.y / r : 0.0;
+          float nx = r > 0.01 ? vWorldPos.x / r : 0.0;
+          float nBias = clamp(ny, 0.0, 1.0);
+          float wBias = clamp(-nx, 0.0, 1.0);
+          float dirFactor = mix(0.05, 1.0, nBias * 0.65 + wBias * 0.35);
+          float alpha = glow * dirFactor * 0.85;
           if (alpha < 0.002) discard;
           gl_FragColor = vec4(0.35, 0.58, 1.0, alpha);
         }
