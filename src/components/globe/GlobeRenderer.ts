@@ -11,7 +11,7 @@ interface FpsMonitor {
   frameCount: number;
   lastTime: number;
   fps: number;
-  level: number; // 0=full, 1-3=degraded
+  level: number; // 0=full, 1-2=degraded
 }
 
 export class GlobeRenderer {
@@ -31,6 +31,18 @@ export class GlobeRenderer {
     level: 0,
   };
   private resizeObserver!: ResizeObserver;
+  private destroyed = false;
+
+  // Atmosphere — stored for disposal
+  private atmosphereMeshes: THREE.Mesh[] = [];
+
+  // Shared dot circle texture — created once, reused for placeholder + world map
+  private circleTexture: THREE.Texture | null = null;
+
+  // Shared orbit/satellite resources — stored for disposal in buildOrbits()
+  private orbitTubeMat: THREE.MeshBasicMaterial | null = null;
+  private satSharedGeo: THREE.SphereGeometry | null = null;
+  private satSharedMat: THREE.MeshBasicMaterial | null = null;
 
   constructor(private canvas: HTMLCanvasElement) {
     this.renderer = new THREE.WebGLRenderer({
@@ -95,7 +107,8 @@ export class GlobeRenderer {
     return new THREE.Mesh(geo, mat);
   }
 
-  private createCircleTexture(): THREE.Texture {
+  private getCircleTexture(): THREE.Texture {
+    if (this.circleTexture) return this.circleTexture;
     const size = 64;
     const cv = document.createElement("canvas");
     cv.width = size;
@@ -106,8 +119,8 @@ export class GlobeRenderer {
     ctx.arc(size / 2, size / 2, size / 2 - 1, 0, Math.PI * 2);
     ctx.fillStyle = "#fff";
     ctx.fill();
-    const tex = new THREE.CanvasTexture(cv);
-    return tex;
+    this.circleTexture = new THREE.CanvasTexture(cv);
+    return this.circleTexture;
   }
 
   private createDotPlaceholder(): THREE.Points {
@@ -141,7 +154,7 @@ export class GlobeRenderer {
       color: 0x334155,
       size: DOT_SIZE,
       sizeAttenuation: true,
-      map: this.createCircleTexture(),
+      map: this.getCircleTexture(),
       alphaTest: 0.5,
       transparent: true,
     });
@@ -157,6 +170,9 @@ export class GlobeRenderer {
       img.onerror = rej;
       img.src = url;
     });
+
+    // Guard: renderer may have been destroyed while image was loading
+    if (this.destroyed) return;
 
     const cv = document.createElement("canvas");
     cv.width = img.width;
@@ -204,7 +220,7 @@ export class GlobeRenderer {
       color: 0xffffff,
       size: DOT_SIZE,
       sizeAttenuation: true,
-      map: this.createCircleTexture(),
+      map: this.getCircleTexture(),
       alphaTest: 0.5,
       transparent: true,
       opacity: 0.85,
@@ -218,7 +234,19 @@ export class GlobeRenderer {
   }
 
   buildOrbits(): void {
+    // Dispose GPU resources from previous call before clearing
+    for (const child of this.orbitLines.children) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+    this.orbitTubeMat?.dispose();
     this.orbitLines.clear();
+
+    for (const child of this.satDots.children) {
+      // geometry/material are shared — disposed via fields below
+      void child;
+    }
+    this.satSharedGeo?.dispose();
+    this.satSharedMat?.dispose();
     this.satDots.clear();
 
     // Tilt groups to match globe
@@ -226,15 +254,15 @@ export class GlobeRenderer {
     this.satDots.rotation.x = GLOBE_TILT_X;
 
     // Shared tube material — single mesh per orbit, no cap overlap
-    const tubeMat = new THREE.MeshBasicMaterial({
+    this.orbitTubeMat = new THREE.MeshBasicMaterial({
       color: 0xffffff,
       transparent: true,
       opacity: 0.28,
       depthWrite: false,
     });
 
-    const satGeo = new THREE.SphereGeometry(0.012, 8, 8);
-    const satMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    this.satSharedGeo = new THREE.SphereGeometry(0.012, 8, 8);
+    this.satSharedMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const sat of SATELLITES) {
       const points = generateOrbit({ ...sat, steps: ORBIT_STEPS });
@@ -245,13 +273,13 @@ export class GlobeRenderer {
         true, // closed
       );
       const tubeGeo = new THREE.TubeGeometry(curve, 80, 0.004, 4, true);
-      this.orbitLines.add(new THREE.Mesh(tubeGeo, tubeMat));
+      this.orbitLines.add(new THREE.Mesh(tubeGeo, this.orbitTubeMat));
 
       // Satellite — float progress for lerp-based smooth motion
       const startProg = Math.random() * ORBIT_STEPS;
       const startIdx = Math.floor(startProg) % ORBIT_STEPS;
       const [sx, sy, sz] = points[startIdx]!;
-      const satMesh = new THREE.Mesh(satGeo, satMat);
+      const satMesh = new THREE.Mesh(this.satSharedGeo, this.satSharedMat);
       satMesh.position.set(sx, sy, sz);
       satMesh.userData["orbitPoints"] = points;
       satMesh.userData["orbitProgress"] = startProg;
@@ -259,40 +287,57 @@ export class GlobeRenderer {
     }
   }
 
-  private addAtmosphere(): void {
-    // Flat plane facing the camera — no sphere geometry boundary.
-    // Glow computed as radial gradient from globe center; depth test hides
-    // the portion behind the globe. Plane is large enough that its edges
-    // are never reached by the visible glow.
-    const mat = new THREE.ShaderMaterial({
+  private makeGlowMaterial(threshold: number, color: [number, number, number]): THREE.ShaderMaterial {
+    // vPlanePos is the object-space XY position of the plane vertex.
+    // The plane sits at world origin with no transform, so object-space = world-space.
+    return new THREE.ShaderMaterial({
       vertexShader: `
-        varying vec3 vWorldPos;
+        varying vec2 vPlanePos;
         void main() {
-          vWorldPos = position;
+          vPlanePos = position.xy;
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
         }
       `,
       fragmentShader: `
-        varying vec3 vWorldPos;
+        varying vec2 vPlanePos;
         void main() {
-          float r = length(vWorldPos.xy);
-          float glow = exp(-max(r - 0.95, 0.0) * 18.0);
+          float r = length(vPlanePos);
+          float glow = exp(-max(r - ${threshold.toFixed(2)}, 0.0) * 45.0);
           // Directional bias: bright top-left, dim bottom-right
-          float ny = r > 0.01 ? vWorldPos.y / r : 0.0;
-          float nx = r > 0.01 ? vWorldPos.x / r : 0.0;
+          float ny = r > 0.01 ? vPlanePos.y / r : 0.0;
+          float nx = r > 0.01 ? vPlanePos.x / r : 0.0;
           float nBias = clamp(ny, 0.0, 1.0);
           float wBias = clamp(-nx, 0.0, 1.0);
           float dirFactor = mix(0.05, 1.0, nBias * 0.65 + wBias * 0.35);
           float alpha = glow * dirFactor * 0.85;
           if (alpha < 0.002) discard;
-          gl_FragColor = vec4(0.35, 0.58, 1.0, alpha);
+          gl_FragColor = vec4(${color[0].toFixed(2)}, ${color[1].toFixed(2)}, ${color[2].toFixed(2)}, alpha);
         }
       `,
       blending: THREE.AdditiveBlending,
       transparent: true,
       depthWrite: false,
     });
-    this.scene.add(new THREE.Mesh(new THREE.PlaneGeometry(14, 14), mat));
+  }
+
+  private addAtmosphere(): void {
+    // Flat plane facing the camera — no sphere geometry boundary.
+    // Glow computed as radial gradient from globe center; depth test hides
+    // the portion behind the globe (globe sphere has default depthWrite:true).
+    // Plane is large enough that its edges are never reached by the visible glow.
+    const planeGeo = new THREE.PlaneGeometry(14, 14);
+
+    const layers: Array<{ threshold: number; color: [number, number, number] }> = [
+      { threshold: 1.05, color: [0.35, 0.58, 1.0] }, // outer blue glow
+      { threshold: 1.03, color: [0.80, 0.80, 1.0] }, // inner brighter rim
+    ];
+
+    for (const { threshold, color } of layers) {
+      const mat = this.makeGlowMaterial(threshold, color);
+      const mesh = new THREE.Mesh(planeGeo, mat);
+      this.atmosphereMeshes.push(mesh);
+      this.scene.add(mesh);
+    }
   }
 
   private monitorFps(now: number): void {
@@ -336,7 +381,8 @@ export class GlobeRenderer {
       for (const child of this.satDots.children) {
         const mesh = child as THREE.Mesh;
         const pts = mesh.userData["orbitPoints"] as Vec3[];
-        const prog = (mesh.userData["orbitProgress"] as number) + 1 / 10;
+        // Wrap progress to prevent floating-point precision loss over time
+        const prog = ((mesh.userData["orbitProgress"] as number) + 0.1) % pts.length;
         mesh.userData["orbitProgress"] = prog;
         const i0 = Math.floor(prog) % pts.length;
         const i1 = (i0 + 1) % pts.length;
@@ -361,8 +407,38 @@ export class GlobeRenderer {
   }
 
   destroy(): void {
+    this.destroyed = true;
     this.stop();
     this.resizeObserver.disconnect();
+
+    // Dispose atmosphere meshes — shared geometry + per-layer material
+    if (this.atmosphereMeshes.length > 0) {
+      this.atmosphereMeshes[0]!.geometry.dispose(); // shared PlaneGeometry
+      for (const mesh of this.atmosphereMeshes) {
+        (mesh.material as THREE.Material).dispose();
+      }
+      this.atmosphereMeshes = [];
+    }
+
+    // Dispose orbit/satellite GPU resources
+    for (const child of this.orbitLines.children) {
+      (child as THREE.Mesh).geometry.dispose();
+    }
+    this.orbitTubeMat?.dispose();
+    this.satSharedGeo?.dispose();
+    this.satSharedMat?.dispose();
+
+    // Dispose globe
+    this.globe.geometry.dispose();
+    (this.globe.material as THREE.Material).dispose();
+
+    // Dispose dots
+    this.dots.geometry.dispose();
+    (this.dots.material as THREE.Material).dispose();
+
+    // Dispose shared circle texture
+    this.circleTexture?.dispose();
+
     this.renderer.dispose();
   }
 }
