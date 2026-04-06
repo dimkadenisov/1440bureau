@@ -1,56 +1,16 @@
 ---
 // src/components/Globe.astro
-// Renders SVG placeholder immediately; lazy-loads WebGL globe on intersection.
+// Shows WebP snapshot immediately; lazy-loads WebGL globe on intersection.
 ---
 
 <div class="globe-wrap" id="globe-wrap" aria-hidden="true">
-  <!-- SVG placeholder — visible until WebGL loads -->
-  <svg
-    class="globe-svg"
-    id="globe-svg"
-    viewBox="0 0 400 400"
-    xmlns="http://www.w3.org/2000/svg"
+  <img
+    class="globe-fallback"
+    id="globe-fallback"
+    src="/globe-snapshot.webp"
     aria-hidden="true"
-  >
-    <defs>
-      <radialGradient id="globeGrad" cx="38%" cy="35%" r="65%">
-        <stop offset="0%" stop-color="#1a2a3a"/>
-        <stop offset="100%" stop-color="#050a10"/>
-      </radialGradient>
-      <radialGradient id="atmGrad" cx="50%" cy="50%" r="50%">
-        <stop offset="70%" stop-color="transparent"/>
-        <stop offset="100%" stop-color="rgba(80,120,200,0.12)"/>
-      </radialGradient>
-      <clipPath id="globeClip">
-        <circle cx="200" cy="200" r="160"/>
-      </clipPath>
-    </defs>
-    <!-- Base sphere -->
-    <circle cx="200" cy="200" r="160" fill="url(#globeGrad)"/>
-    <!-- Grid lines -->
-    <g clip-path="url(#globeClip)" stroke="rgba(255,255,255,0.07)" stroke-width="0.5" fill="none">
-      <!-- Latitude lines -->
-      <ellipse cx="200" cy="200" rx="160" ry="40"/>
-      <ellipse cx="200" cy="200" rx="160" ry="100"/>
-      <ellipse cx="200" cy="200" rx="130" ry="32"/>
-      <line x1="40" y1="200" x2="360" y2="200"/>
-      <!-- Longitude lines -->
-      <ellipse cx="200" cy="200" rx="40" ry="160"/>
-      <ellipse cx="200" cy="200" rx="100" ry="160"/>
-    </g>
-    <!-- Orbit lines (stylised) -->
-    <ellipse cx="200" cy="200" rx="185" ry="46" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1" transform="rotate(-30 200 200)"/>
-    <ellipse cx="200" cy="200" rx="185" ry="46" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="1" transform="rotate(30 200 200)"/>
-    <ellipse cx="200" cy="200" rx="185" ry="46" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1" transform="rotate(90 200 200)"/>
-    <!-- Satellite dots -->
-    <circle cx="200" cy="152" r="3" fill="white" opacity="0.9"/>
-    <circle cx="340" cy="220" r="2.5" fill="white" opacity="0.7"/>
-    <circle cx="80" cy="180" r="2" fill="white" opacity="0.6"/>
-    <!-- Atmosphere glow -->
-    <circle cx="200" cy="200" r="172" fill="url(#atmGrad)"/>
-  </svg>
-
-  <!-- Canvas for WebGL globe -->
+    alt=""
+  />
   <canvas class="globe-canvas" id="globe-canvas" style="opacity:0"></canvas>
 </div>
 
@@ -61,7 +21,7 @@
     height: 100%;
   }
 
-  .globe-svg,
+  .globe-fallback,
   .globe-canvas {
     position: absolute;
     inset: 0;
@@ -69,7 +29,8 @@
     height: 100%;
   }
 
-  .globe-svg {
+  .globe-fallback {
+    object-fit: contain;
     transition: opacity 0.6s ease;
   }
 
@@ -81,7 +42,7 @@
 <script>
   const wrap = document.getElementById('globe-wrap')!;
   const canvas = document.getElementById('globe-canvas') as HTMLCanvasElement;
-  const svg = document.getElementById('globe-svg') as unknown as SVGElement;
+  const fallback = document.getElementById('globe-fallback') as HTMLImageElement;
 
   let loaded = false;
 
@@ -93,17 +54,15 @@
     const { GlobeRenderer } = await import('./globe/GlobeRenderer');
 
     const renderer = new GlobeRenderer(canvas);
-    await renderer.loadWorldMap('/world.png').catch(() => {
-      // If world map fails, globe still works with placeholder dots
-    });
+    await renderer.loadWorldMap('/world.png').catch(() => {});
     renderer.buildOrbits();
     renderer.start();
     window.addEventListener('beforeunload', () => renderer.destroy(), { once: true });
 
-    // Crossfade SVG → canvas
+    // Crossfade fallback → canvas
     canvas.style.opacity = '1';
-    svg.style.opacity = '0';
-    svg.addEventListener('transitionend', () => { svg.style.display = 'none'; }, { once: true });
+    fallback.style.opacity = '0';
+    fallback.addEventListener('transitionend', () => { fallback.style.display = 'none'; }, { once: true });
   }, { threshold: 0.1 });
 
   observer.observe(wrap);
