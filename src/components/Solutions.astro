@@ -8,24 +8,59 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const solutions = [
-  'extractive', 'geo', 'telecom', 'aviation',
-  'rail', 'maritime', 'auto', 'education',
-  'health', 'emergency', 'gov',
+  { key: 'extractive', desktopSrc: '/solutions/extractive-desktop.jpg', desktopType: 'image/jpeg', mobileSrc: '/solutions/extractive-mobile.png', mobileType: 'image/png' },
+  { key: 'geo',        desktopSrc: '/solutions/geo-desktop.png',        desktopType: 'image/png',  mobileSrc: '/solutions/geo-mobile.png',        mobileType: 'image/png' },
+  { key: 'telecom',   desktopSrc: '/solutions/telecom-desktop.jpg',    desktopType: 'image/jpeg', mobileSrc: '/solutions/telecom-mobile.png',    mobileType: 'image/png' },
+  { key: 'aviation',  desktopSrc: '/solutions/aviation-desktop.webp',  desktopType: 'image/webp', mobileSrc: '/solutions/aviation-mobile.png',  mobileType: 'image/png' },
+  { key: 'rail',      desktopSrc: '/solutions/rail-desktop.png',       desktopType: 'image/png',  mobileSrc: '/solutions/rail-mobile.png',      mobileType: 'image/png' },
+  { key: 'maritime',  desktopSrc: '/solutions/maritime-desktop.webp',  desktopType: 'image/webp', mobileSrc: '/solutions/maritime-mobile.png',  mobileType: 'image/png' },
+  { key: 'auto',      desktopSrc: '/solutions/auto-desktop.webp',      desktopType: 'image/webp', mobileSrc: '/solutions/auto-mobile.png',      mobileType: 'image/png' },
+  { key: 'education', desktopSrc: '/solutions/education-desktop.webp', desktopType: 'image/webp', mobileSrc: '/solutions/education-mobile.png', mobileType: 'image/png' },
+  { key: 'health',    desktopSrc: '/solutions/health-desktop.webp',    desktopType: 'image/webp', mobileSrc: '/solutions/health-mobile.png',    mobileType: 'image/png' },
+  { key: 'emergency', desktopSrc: '/solutions/emergency-desktop.webp', desktopType: 'image/webp', mobileSrc: '/solutions/emergency-mobile.png', mobileType: 'image/png' },
+  { key: 'gov',       desktopSrc: '/solutions/gov-desktop.png',        desktopType: 'image/png',  mobileSrc: '/solutions/gov-mobile.png',       mobileType: 'image/png' },
 ] as const;
 ---
 
-<section class="section" id="solutions">
+<section class="section solutions" id="solutions">
   <p class="label" data-animate>{t('solutions.label')}</p>
   <h2 class="solutions__title" data-animate>{t('solutions.title')}</h2>
 
-  <ul class="solutions__grid" role="list">
-    {solutions.map((key) => (
-      <li class="solutions__item" data-animate>
-        <span class="solutions__item-name">{t(`solutions.${key}` as any)}</span>
-        <span class="solutions__item-arrow" aria-hidden="true">→</span>
-      </li>
+  <div class="solutions__accordion" role="list">
+    {solutions.map(({ key, desktopSrc, desktopType, mobileSrc, mobileType }, i) => (
+      <div
+        class:list={['solutions__strip', { 'solutions__strip--active': i === 0 }]}
+        role="listitem"
+        data-solution={key}
+        tabindex="0"
+        aria-expanded={i === 0 ? 'true' : 'false'}
+      >
+        <picture class="solutions__picture" aria-hidden="true">
+          <source media="(max-width: 768px)" srcset={mobileSrc} type={mobileType} />
+          <source media="(min-width: 769px)" srcset={desktopSrc} type={desktopType} />
+          <img
+            src={desktopSrc}
+            alt=""
+            class="solutions__img"
+            loading={i === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        </picture>
+
+        <div class="solutions__overlay" aria-hidden="true"></div>
+
+        <div class="solutions__header">
+          <span class="solutions__num label">{String(i + 1).padStart(2, '0')}</span>
+          <span class="solutions__name">{t(`solutions.${key}` as any)}</span>
+          <span class="solutions__arrow" aria-hidden="true">→</span>
+        </div>
+
+        <div class="solutions__body">
+          <p class="solutions__desc">{t(`solutions.${key}_desc` as any)}</p>
+        </div>
+      </div>
     ))}
-  </ul>
+  </div>
 </section>
 
 <style>
@@ -33,49 +68,211 @@ const solutions = [
     font-size: clamp(24px, 3vw, 44px);
     font-weight: 700;
     letter-spacing: -0.02em;
-    margin: 12px 0 48px;
+    margin: 12px 0 32px;
   }
 
-  .solutions__grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 1px;
-    background: var(--color-border);
-    border: 1px solid var(--color-border);
-    border-radius: 8px;
+  .solutions__accordion {
+    border-top: 1px solid var(--color-border);
+  }
+
+  /* ── Strip ── */
+  .solutions__strip {
+    position: relative;
     overflow: hidden;
-    list-style: none;
+    border-bottom: 1px solid var(--color-border);
+    cursor: pointer;
+    /* collapsed height */
+    height: 52px;
+    transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
   }
 
-  .solutions__item {
-    background: var(--color-bg);
-    padding: 24px;
+  .solutions__strip--active {
+    height: 280px;
+  }
+
+  @media (max-width: 768px) {
+    .solutions__strip--active {
+      height: 240px;
+    }
+  }
+
+  /* ── Background image ── */
+  .solutions__picture {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .solutions__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0;
+    transform: scale(1.04);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+  }
+
+  .solutions__strip--active .solutions__img {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* ── Gradient overlay ── */
+  .solutions__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.88) 0%,
+      rgba(0, 0, 0, 0.55) 45%,
+      rgba(0, 0, 0, 0.12) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+  }
+
+  .solutions__strip--active .solutions__overlay {
+    opacity: 1;
+  }
+
+  /* ── Header row (always visible) ── */
+  .solutions__header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 52px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    padding: 0 var(--section-padding, 40px);
     gap: 16px;
-    transition: background 0.15s ease;
-    cursor: default;
+    z-index: 2;
+    transition: background 0.2s ease;
   }
 
-  .solutions__item:hover {
-    background: var(--color-surface);
+  .solutions__strip:not(.solutions__strip--active):hover .solutions__header {
+    background: rgba(255, 255, 255, 0.03);
   }
 
-  .solutions__item-name {
-    font-size: 15px;
-    font-weight: 500;
-  }
-
-  .solutions__item-arrow {
-    color: var(--color-muted);
-    font-size: 14px;
-    transition: transform 0.15s ease, color 0.15s ease;
+  .solutions__num {
     flex-shrink: 0;
+    width: 28px;
+    color: var(--color-muted);
+    transition: color 0.3s;
   }
 
-  .solutions__item:hover .solutions__item-arrow {
-    transform: translateX(4px);
-    color: var(--color-text);
+  .solutions__strip--active .solutions__num {
+    color: color-mix(in srgb, var(--color-muted) 60%, white);
+  }
+
+  .solutions__name {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+    transition: color 0.3s;
+  }
+
+  .solutions__strip--active .solutions__name {
+    color: #fff;
+  }
+
+  .solutions__arrow {
+    flex-shrink: 0;
+    font-size: 14px;
+    color: var(--color-border);
+    transition: color 0.3s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .solutions__strip--active .solutions__arrow {
+    color: #fff;
+    transform: rotate(90deg);
+  }
+
+  .solutions__strip:not(.solutions__strip--active):hover .solutions__arrow {
+    color: var(--color-muted);
+  }
+
+  /* ── Expanded body ── */
+  .solutions__body {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 0 var(--section-padding, 40px) 28px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease 0.15s, transform 0.3s ease 0.15s;
+    pointer-events: none;
+  }
+
+  .solutions__strip--active .solutions__body {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .solutions__desc {
+    max-width: 540px;
+    font-size: 14px;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  @media (max-width: 768px) {
+    .solutions__header {
+      padding: 0 20px;
+    }
+    .solutions__body {
+      padding: 0 20px 20px;
+    }
+    .solutions__desc {
+      font-size: 13px;
+    }
   }
 </style>
+
+<script>
+  function initSolutions() {
+    const strips = document.querySelectorAll<HTMLElement>('.solutions__strip');
+
+    function activate(target: HTMLElement) {
+      strips.forEach((s) => {
+        const isTarget = s === target;
+        s.classList.toggle('solutions__strip--active', isTarget);
+        s.setAttribute('aria-expanded', String(isTarget));
+      });
+    }
+
+    strips.forEach((strip) => {
+      strip.addEventListener('click', () => activate(strip));
+      strip.addEventListener('keydown', (e: KeyboardEvent) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          activate(strip);
+        }
+      });
+    });
+  }
+
+  // Init on intersection to avoid running before DOM is ready
+  const section = document.getElementById('solutions');
+  if (section) {
+    const obs = new IntersectionObserver((entries) => {
+      if (entries[0]?.isIntersecting) {
+        obs.disconnect();
+        initSolutions();
+      }
+    });
+    obs.observe(section);
+  }
+</script>
