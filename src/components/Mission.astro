@@ -14,76 +14,151 @@ const specs = [
 ];
 ---
 
-<section class="section" id="mission">
-  <h2 class="mission__title" data-animate>{t('mission.title')}</h2>
-  <div class="mission__specs">
-    {specs.map((s) => (
-      <div class="mission__spec" data-animate>
-        <div class="mission__spec-value">{s.value}</div>
-        <div class="mission__spec-label">{s.label}</div>
-      </div>
-    ))}
+<section class="mission-section" id="mission">
+  <!-- Video background -->
+  <video
+    class="mission-video"
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="none"
+    poster="https://1440.space/wp-content/uploads/2025/04/Sequence-01.00_02_51_23.Still005-scaled.jpg"
+  >
+    <source media="(max-width: 767px)"  src="https://1440.space/wp-content/uploads/2025/04/390-x-810-3mb.mp4"   type="video/mp4" />
+    <source media="(max-width: 1023px)" src="https://1440.space/wp-content/uploads/2025/04/768-x-1000-3mb.mp4"  type="video/mp4" />
+    <source                             src="https://1440.space/wp-content/uploads/2025/04/1920h1080-_3mb2-1.mp4" type="video/mp4" />
+  </video>
+  <div class="mission-overlay"></div>
+
+  <!-- Content on top -->
+  <div class="mission-inner">
+    <p class="label mission__label" data-animate>{t('mission.label')}</p>
+    <h2 class="mission__title" data-animate>{t('mission.title')}</h2>
+    <div class="mission__specs">
+      {specs.map((s) => (
+        <div class="mission__spec" data-animate>
+          <div class="mission__spec-value">{s.value}</div>
+          <div class="mission__spec-label">{s.label}</div>
+        </div>
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
+  .mission-section {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Video fills entire section behind content */
+  .mission-video {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+  }
+
+  /* Gradient overlay for text legibility */
+  .mission-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom,
+      rgba(15, 16, 17, 0.6) 0%,
+      rgba(15, 16, 17, 0.35) 40%,
+      rgba(15, 16, 17, 0.6) 100%
+    );
+  }
+
+  /* Content sits above video + overlay */
+  .mission-inner {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 120px 40px;
+    gap: 28px;
+  }
+
+  .mission__label {
+    color: rgba(255, 255, 255, 0.65);
+    letter-spacing: 0.18em;
+  }
+
   .mission__title {
-    font-size: clamp(28px, 4vw, 56px);
+    font-size: clamp(32px, 5vw, 72px);
     font-weight: 700;
     letter-spacing: -0.02em;
     line-height: 1.05;
     text-transform: uppercase;
     max-width: 900px;
-    margin-bottom: 60px;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
   }
 
   .mission__specs {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 0;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    margin-top: 32px;
   }
 
   .mission__spec {
-    padding: 32px 0;
-    border-right: 1px solid var(--color-border);
-    padding-right: 40px;
+    padding: 32px 40px 32px 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  .mission__spec:first-child {
-    padding-left: 0;
-  }
+  .mission__spec:first-child { padding-left: 0; }
 
   .mission__spec:last-child {
     border-right: none;
     padding-left: 40px;
   }
 
-  .mission__spec:nth-child(2) {
-    padding-left: 40px;
-  }
+  .mission__spec:nth-child(2) { padding-left: 40px; }
 
   .mission__spec-value {
     font-size: clamp(28px, 3vw, 44px);
     font-weight: 700;
     letter-spacing: -0.02em;
     margin-bottom: 6px;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4);
   }
 
   .mission__spec-label {
     font-size: 13px;
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.6);
     text-transform: uppercase;
     letter-spacing: 0.1em;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: 768px) {
+    .mission-inner {
+      padding: 80px 20px;
+    }
+
     .mission__specs {
       grid-template-columns: 1fr;
     }
+
     .mission__spec {
       border-right: none;
-      border-bottom: 1px solid var(--color-border);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
       padding: 24px 0 !important;
     }
   }

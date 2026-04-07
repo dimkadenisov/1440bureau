@@ -1,49 +1,27 @@
 ---
 // src/components/Hero.astro
-import Globe from './Globe.astro';
-import { useTranslations } from '../i18n/utils';
-import type { Lang } from '../i18n/utils';
+import Globe from "./Globe.astro";
+import { useTranslations } from "../i18n/utils";
+import type { Lang } from "../i18n/utils";
 
-interface Props { lang: Lang }
+interface Props {
+  lang: Lang;
+}
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 ---
 
 <section class="hero" id="hero">
   <div class="hero__content">
-    <p class="label hero__label" data-animate>{t('hero.label')}</p>
-    <h1 class="hero__title" data-animate>{t('hero.title')}</h1>
-    <p class="hero__subtitle" data-animate>{t('hero.subtitle')}</p>
+    <p class="label hero__label" data-animate>{t("hero.label")}</p>
+    <h1 class="hero__title" data-animate>{t("hero.title")}</h1>
+    <p class="hero__subtitle" data-animate>{t("hero.subtitle")}</p>
 
     <div class="hero__ctas" data-animate>
-      <a href="#contact" class="btn btn-primary">{t('hero.cta_primary')}</a>
-      <a href="#mission" class="btn btn-secondary">{t('hero.cta_secondary')} ↓</a>
-    </div>
-
-    <div class="hero__missions" data-animate="fade">
-      <div class="mission-badge">
-        <span class="mission-badge__name">{t('hero.mission1_name')}</span>
-        <span class="mission-badge__details">{t('hero.mission1_details')}</span>
-      </div>
-      <div class="mission-badge">
-        <span class="mission-badge__name">{t('hero.mission2_name')}</span>
-        <span class="mission-badge__details">{t('hero.mission2_details')}</span>
-      </div>
-    </div>
-
-    <div class="hero__stats" data-animate="fade">
-      <div class="hero__stat">
-        <span class="hero__stat-num" data-count="7515">7 515</span>
-        <span class="hero__stat-label">{t('hero.stat_sessions')}</span>
-      </div>
-      <div class="hero__stat">
-        <span class="hero__stat-num" data-count="5">5</span>
-        <span class="hero__stat-label">{t('hero.stat_satellites')}</span>
-      </div>
-      <div class="hero__stat">
-        <span class="hero__stat-num">800 км</span>
-        <span class="hero__stat-label">{t('hero.stat_orbit')}</span>
-      </div>
+      <a href="#contact" class="btn btn-primary">{t("hero.cta_primary")}</a>
+      <a href="#mission" class="btn btn-secondary"
+        >{t("hero.cta_secondary")} ↓</a
+      >
     </div>
   </div>
 
@@ -103,53 +81,6 @@ const t = useTranslations(lang);
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
-  }
-
-  .mission-badge {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    padding: 10px 14px;
-  }
-
-  .mission-badge__name {
-    font-size: 13px;
-    font-weight: 600;
-  }
-
-  .mission-badge__details {
-    font-size: 11px;
-    color: var(--color-muted);
-  }
-
-  .hero__stats {
-    display: flex;
-    gap: 32px;
-    flex-wrap: wrap;
-    border-top: 1px solid var(--color-border);
-    padding-top: 20px;
-  }
-
-  .hero__stat {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-  }
-
-  .hero__stat-num {
-    font-size: 22px;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-  }
-
-  .hero__stat-label {
-    font-size: 11px;
-    color: var(--color-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
   }
 
   .hero__globe {
