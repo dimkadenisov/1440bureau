@@ -50,6 +50,18 @@ export const en = {
   "solutions.emergency": "Emergency services",
   "solutions.gov": "Regional government",
 
+  "solutions.extractive_desc": "Enabling intelligent extraction management systems, remote monitoring of facilities and special vehicles, and video analytics services.",
+  "solutions.geo_desc": "Real-time transmission of large data sets from field sites, regular updates and backup. Rapid deployment of compact equipment for field bases and mobile parties.",
+  "solutions.telecom_desc": "Seamless integration of operator networks with the BUREAU 1440 satellite constellation. Base station channel redundancy and uninterrupted service even during failures on wired lines.",
+  "solutions.aviation_desc": "High-speed in-flight internet for passengers throughout the entire journey. New services for operational data transmission and aircraft tracking.",
+  "solutions.rail_desc": "High-quality connectivity along the entire train route. Deployment and enhancement of intelligent transport systems for process automation and remote monitoring.",
+  "solutions.maritime_desc": "Navigation, dispatch control and data collection systems, voice and video communication, remote monitoring and maintenance of vessels.",
+  "solutions.auto_desc": "Connectivity for smart and autonomous vehicles, coverage along the entire route, internet for passengers and drivers, 24/7 navigation.",
+  "solutions.education_desc": "Online classes, exams and video conferences with any number of participants in the most remote regions regardless of latitude.",
+  "solutions.health_desc": "Telemedicine, instant patient data transmission, and database synchronization. Emergency evacuation of critically ill patients.",
+  "solutions.emergency_desc": "Faster response and coordination of emergency services. Rapid equipment deployment without specialists for action synchronization and communications.",
+  "solutions.gov_desc": "Rapid exchange of large data volumes, database access, and secure voice and video communication between facilities in hard-to-reach areas.",
+
   "timeline.label": "Timeline",
   "timeline.future": "Target",
 
