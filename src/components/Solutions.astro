@@ -84,7 +84,11 @@ const solutions = [
     /* collapsed height */
     height: 52px;
     transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    outline: none;
+  }
+
+  .solutions__strip:focus-visible {
+    outline: 2px solid var(--color-muted);
+    outline-offset: -2px;
   }
 
   .solutions__strip--active {
@@ -168,6 +172,7 @@ const solutions = [
   }
 
   .solutions__strip--active .solutions__num {
+    color: #999;
     color: color-mix(in srgb, var(--color-muted) 60%, white);
   }
 
