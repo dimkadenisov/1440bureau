@@ -53,6 +53,7 @@ public/
 ## Task 1: Initialize Astro project
 
 **Files:**
+
 - Create: `package.json`, `astro.config.mjs`, `tsconfig.json`
 
 - [ ] **Step 1: Scaffold project**
@@ -75,13 +76,13 @@ npm install -D @types/three vitest @vitest/coverage-v8
 
 ```js
 // astro.config.mjs
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
 export default defineConfig({
-  site: 'https://1440.space',
+  site: "https://1440.space",
   i18n: {
-    defaultLocale: 'ru',
-    locales: ['ru', 'en'],
+    defaultLocale: "ru",
+    locales: ["ru", "en"],
     routing: {
       prefixDefaultLocale: false,
     },
@@ -106,6 +107,7 @@ export default defineConfig({
 - [ ] **Step 5: Configure vitest**
 
 Add to `package.json` scripts:
+
 ```json
 {
   "scripts": {
@@ -119,12 +121,13 @@ Add to `package.json` scripts:
 ```
 
 Create `vitest.config.ts`:
+
 ```ts
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from "vitest/config";
 
 export default defineConfig({
   test: {
-    environment: 'node',
+    environment: "node",
   },
 });
 ```
@@ -167,6 +170,7 @@ git commit -m "chore: init astro project with three.js, gsap, vitest"
 ## Task 2: Design system (global.css)
 
 **Files:**
+
 - Create: `src/styles/global.css`
 
 - [ ] **Step 1: Write global.css**
@@ -175,14 +179,15 @@ git commit -m "chore: init astro project with three.js, gsap, vitest"
 /* src/styles/global.css */
 
 :root {
-  --color-bg:      #0f1011;
-  --color-text:    #ffffff;
-  --color-muted:   #858585;
-  --color-border:  rgba(255, 255, 255, 0.1);
+  --color-bg: #0f1011;
+  --color-text: #ffffff;
+  --color-muted: #858585;
+  --color-border: rgba(255, 255, 255, 0.1);
   --color-surface: rgba(255, 255, 255, 0.03);
 
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'SF Mono', 'Fira Code', monospace;
+  --font-sans:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-mono: "SF Mono", "Fira Code", monospace;
 
   --radius-sm: 2px;
   --radius-md: 4px;
@@ -192,7 +197,9 @@ git commit -m "chore: init astro project with three.js, gsap, vitest"
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
@@ -213,7 +220,8 @@ body {
   overflow-x: hidden;
 }
 
-img, svg {
+img,
+svg {
   max-width: 100%;
   display: block;
 }
@@ -234,7 +242,9 @@ a {
   font-weight: 600;
   letter-spacing: 0.02em;
   cursor: pointer;
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease;
   border: none;
   line-height: 1;
   white-space: nowrap;
@@ -320,6 +330,7 @@ git commit -m "feat: add design system css"
 ## Task 3: i18n
 
 **Files:**
+
 - Create: `src/i18n/ru.ts`, `src/i18n/en.ts`, `src/i18n/utils.ts`
 - Create: `src/i18n/utils.test.ts`
 
@@ -327,38 +338,38 @@ git commit -m "feat: add design system css"
 
 ```ts
 // src/i18n/utils.test.ts
-import { describe, it, expect } from 'vitest';
-import { getLangFromUrl, useTranslations } from './utils';
-import type { Lang } from './utils';
+import { describe, it, expect } from "vitest";
+import { getLangFromUrl, useTranslations } from "./utils";
+import type { Lang } from "./utils";
 
-describe('getLangFromUrl', () => {
-  it('returns ru for root path', () => {
-    expect(getLangFromUrl(new URL('https://1440.space/'))).toBe('ru');
+describe("getLangFromUrl", () => {
+  it("returns ru for root path", () => {
+    expect(getLangFromUrl(new URL("https://1440.space/"))).toBe("ru");
   });
 
-  it('returns en for /en/ path', () => {
-    expect(getLangFromUrl(new URL('https://1440.space/en/'))).toBe('en');
+  it("returns en for /en/ path", () => {
+    expect(getLangFromUrl(new URL("https://1440.space/en/"))).toBe("en");
   });
 
-  it('returns ru for unknown lang', () => {
-    expect(getLangFromUrl(new URL('https://1440.space/fr/'))).toBe('ru');
+  it("returns ru for unknown lang", () => {
+    expect(getLangFromUrl(new URL("https://1440.space/fr/"))).toBe("ru");
   });
 });
 
-describe('useTranslations', () => {
-  it('returns ru translation', () => {
-    const t = useTranslations('ru');
-    expect(t('nav.mission')).toBe('Миссия');
+describe("useTranslations", () => {
+  it("returns ru translation", () => {
+    const t = useTranslations("ru");
+    expect(t("nav.mission")).toBe("Миссия");
   });
 
-  it('returns en translation', () => {
-    const t = useTranslations('en');
-    expect(t('nav.mission')).toBe('Mission');
+  it("returns en translation", () => {
+    const t = useTranslations("en");
+    expect(t("nav.mission")).toBe("Mission");
   });
 
-  it('falls back to key if translation missing', () => {
-    const t = useTranslations('ru');
-    expect(t('nonexistent.key' as Lang)).toBe('nonexistent.key');
+  it("falls back to key if translation missing", () => {
+    const t = useTranslations("ru");
+    expect(t("nonexistent.key" as Lang)).toBe("nonexistent.key");
   });
 });
 ```
@@ -376,93 +387,99 @@ Expected: FAIL — cannot find module `./utils`
 ```ts
 // src/i18n/ru.ts
 export const ru = {
-  'nav.mission': 'Миссия',
-  'nav.technologies': 'Технологии',
-  'nav.solutions': 'Решения',
-  'nav.timeline': 'Таймлайн',
-  'nav.team': 'Команда',
-  'nav.cta': 'Оставить заявку',
+  "nav.mission": "Миссия",
+  "nav.technologies": "Технологии",
+  "nav.solutions": "Решения",
+  "nav.timeline": "Таймлайн",
+  "nav.team": "Команда",
+  "nav.cta": "Оставить заявку",
 
-  'hero.label': 'Российская аэрокосмическая компания',
-  'hero.title': 'Создаём низкоорбитальную спутниковую систему для широкополосной передачи данных в любую точку планеты',
-  'hero.subtitle': 'Мы первые и единственные в России работаем над коммерческим проектом такого масштаба',
-  'hero.cta_primary': 'Оставить заявку',
-  'hero.cta_secondary': 'Подробнее',
-  'hero.stat_sessions': 'сеансов связи',
-  'hero.stat_satellites': 'спутников на орбите',
-  'hero.stat_orbit': 'высота орбиты',
-  'hero.mission1_name': 'Рассвет-1',
-  'hero.mission1_details': '3 спутника · 550 км · 423 дня',
-  'hero.mission2_name': 'Рассвет-2',
-  'hero.mission2_details': '3 спутника · 800 км · 99 дней',
+  "hero.label": "Российская аэрокосмическая компания",
+  "hero.title":
+    "Создаём низкоорбитальную спутниковую систему для широкополосной передачи данных в любую точку планеты",
+  "hero.subtitle":
+    "Мы первые и единственные в России работаем над коммерческим проектом такого масштаба",
+  "hero.cta_primary": "Оставить заявку",
+  "hero.cta_secondary": "Подробнее",
+  "hero.stat_sessions": "сеансов связи",
+  "hero.stat_satellites": "спутников на орбите",
+  "hero.stat_orbit": "высота орбиты",
+  "hero.mission1_name": "Рассвет-1",
+  "hero.mission1_details": "3 спутника · 550 км · 423 дня",
+  "hero.mission2_name": "Рассвет-2",
+  "hero.mission2_details": "3 спутника · 800 км · 99 дней",
 
-  'mission.title': 'Создать связь будущего без границ на земле',
-  'mission.spec1_value': '800 км',
-  'mission.spec1_label': 'Высота орбиты',
-  'mission.spec2_value': 'до 1 Гбит/с',
-  'mission.spec2_label': 'Скорость интернета',
-  'mission.spec3_value': 'до 70 мс',
-  'mission.spec3_label': 'Задержка сигнала',
+  "mission.title": "Создать связь будущего без границ на земле",
+  "mission.spec1_value": "800 км",
+  "mission.spec1_label": "Высота орбиты",
+  "mission.spec2_value": "до 1 Гбит/с",
+  "mission.spec2_label": "Скорость интернета",
+  "mission.spec3_value": "до 70 мс",
+  "mission.spec3_label": "Задержка сигнала",
 
-  'tech.label': 'Технологии',
-  'tech.1_name': 'Спутниковая группировка',
-  'tech.1_desc': 'Серийные космические аппараты, объединённые лазерным каналом связи',
-  'tech.2_name': 'Космические аппараты',
-  'tech.2_desc': 'Орбитальная базовая станция 5G, до 1 Гбит/с передачи данных',
-  'tech.3_name': 'Терминал лазерной связи',
-  'tech.3_desc': 'Межспутниковые каналы, обеспечивающие глобальное покрытие',
-  'tech.4_name': 'Абонентский терминал',
-  'tech.4_desc': 'Устройства для стационарных и подвижных объектов',
-  'tech.5_name': 'Шлюзовая станция',
-  'tech.5_desc': 'Программно-аппаратный комплекс для интеграции с наземными сетями',
+  "tech.label": "Технологии",
+  "tech.1_name": "Спутниковая группировка",
+  "tech.1_desc":
+    "Серийные космические аппараты, объединённые лазерным каналом связи",
+  "tech.2_name": "Космические аппараты",
+  "tech.2_desc": "Орбитальная базовая станция 5G, до 1 Гбит/с передачи данных",
+  "tech.3_name": "Терминал лазерной связи",
+  "tech.3_desc": "Межспутниковые каналы, обеспечивающие глобальное покрытие",
+  "tech.4_name": "Абонентский терминал",
+  "tech.4_desc": "Устройства для стационарных и подвижных объектов",
+  "tech.5_name": "Шлюзовая станция",
+  "tech.5_desc":
+    "Программно-аппаратный комплекс для интеграции с наземными сетями",
 
-  'solutions.label': 'Решения',
-  'solutions.title': 'Широкополосный интернет для любой отрасли',
-  'solutions.extractive': 'Добывающие компании',
-  'solutions.geo': 'Геологоразведка',
-  'solutions.telecom': 'Операторы связи',
-  'solutions.aviation': 'Авиация',
-  'solutions.rail': 'Ж/Д',
-  'solutions.maritime': 'Судоходство',
-  'solutions.auto': 'Авто',
-  'solutions.education': 'Образование',
-  'solutions.health': 'Здравоохранение',
-  'solutions.emergency': 'МЧС',
-  'solutions.gov': 'РОИВ',
+  "solutions.label": "Решения",
+  "solutions.title": "Широкополосный интернет для любой отрасли",
+  "solutions.extractive": "Добывающие компании",
+  "solutions.geo": "Геологоразведка",
+  "solutions.telecom": "Операторы связи",
+  "solutions.aviation": "Авиация",
+  "solutions.rail": "Ж/Д",
+  "solutions.maritime": "Судоходство",
+  "solutions.auto": "Авто",
+  "solutions.education": "Образование",
+  "solutions.health": "Здравоохранение",
+  "solutions.emergency": "МЧС",
+  "solutions.gov": "РОИВ",
 
-  'timeline.label': 'Хронология',
-  'timeline.future': 'Цель',
+  "timeline.label": "Хронология",
+  "timeline.future": "Цель",
 
-  'team.label': 'Команда',
-  'team.title': 'Молодые профессионалы из аэрокосмической индустрии, IT и телекома',
-  'team.stat_count': '~3 000 сотрудников',
-  'team.stat_engineers': '80% — инженеры, конструкторы, разработчики ПО',
-  'team.cta': 'Присоединиться',
+  "team.label": "Команда",
+  "team.title":
+    "Молодые профессионалы из аэрокосмической индустрии, IT и телекома",
+  "team.stat_count": "~3 000 сотрудников",
+  "team.stat_engineers": "80% — инженеры, конструкторы, разработчики ПО",
+  "team.cta": "Присоединиться",
 
-  'why.label': 'Почему 1440',
-  'why.text': 'За первые сутки на орбите Спутник-1 совершил ровно 1440 витков. Это число стало символом нашего наследия и точкой отсчёта для новой эры российской космической связи.',
+  "why.label": "Почему 1440?",
+  "why.text":
+    "За первые сутки на орбите Спутник-1 совершил ровно 1440 витков. Это число стало символом нашего наследия и точкой отсчёта для новой эры российской космической связи.",
 
-  'form.label': 'Связаться',
-  'form.title': 'Готовы к сотрудничеству?',
-  'form.name': 'Имя',
-  'form.surname': 'Фамилия',
-  'form.company': 'Компания',
-  'form.position': 'Должность',
-  'form.email': 'Email',
-  'form.message': 'Описание запроса',
-  'form.consent': 'Я согласен на обработку персональных данных',
-  'form.submit': 'Отправить',
-  'form.success_title': 'Спасибо',
-  'form.success_text': 'Мы приняли вашу заявку. Скоро свяжемся с вами.',
+  "form.label": "Связаться",
+  "form.title": "Готовы к сотрудничеству?",
+  "form.name": "Имя",
+  "form.surname": "Фамилия",
+  "form.company": "Компания",
+  "form.position": "Должность",
+  "form.email": "Email",
+  "form.message": "Описание запроса",
+  "form.consent": "Я согласен на обработку персональных данных",
+  "form.submit": "Отправить",
+  "form.success_title": "Спасибо",
+  "form.success_text": "Мы приняли вашу заявку. Скоро свяжемся с вами.",
 
-  'footer.contacts': 'Контакты',
-  'footer.address': 'Адрес',
-  'footer.docs': 'Документы',
-  'footer.doc1': 'Пользовательское соглашение',
-  'footer.doc2': 'Политика конфиденциальности',
-  'footer.doc3': 'Политика обработки данных кандидатов',
-  'footer.doc4': 'Политика о кадровом резерве',
-  'footer.doc5': 'ИТ-аккредитация',
+  "footer.contacts": "Контакты",
+  "footer.address": "Адрес",
+  "footer.docs": "Документы",
+  "footer.doc1": "Пользовательское соглашение",
+  "footer.doc2": "Политика конфиденциальности",
+  "footer.doc3": "Политика обработки данных кандидатов",
+  "footer.doc4": "Политика о кадровом резерве",
+  "footer.doc5": "ИТ-аккредитация",
 } as const;
 
 export type TranslationKey = keyof typeof ru;
@@ -473,93 +490,98 @@ export type TranslationKey = keyof typeof ru;
 ```ts
 // src/i18n/en.ts
 export const en = {
-  'nav.mission': 'Mission',
-  'nav.technologies': 'Technologies',
-  'nav.solutions': 'Solutions',
-  'nav.timeline': 'Timeline',
-  'nav.team': 'Team',
-  'nav.cta': 'Get in touch',
+  "nav.mission": "Mission",
+  "nav.technologies": "Technologies",
+  "nav.solutions": "Solutions",
+  "nav.timeline": "Timeline",
+  "nav.team": "Team",
+  "nav.cta": "Get in touch",
 
-  'hero.label': 'Russian aerospace company',
-  'hero.title': 'Building a low-orbit satellite system for broadband connectivity anywhere on Earth',
-  'hero.subtitle': 'The first and only company in Russia developing a commercial project of this scale',
-  'hero.cta_primary': 'Get in touch',
-  'hero.cta_secondary': 'Learn more',
-  'hero.stat_sessions': 'communication sessions',
-  'hero.stat_satellites': 'satellites in orbit',
-  'hero.stat_orbit': 'orbital altitude',
-  'hero.mission1_name': 'Rassvet-1',
-  'hero.mission1_details': '3 satellites · 550 km · 423 days',
-  'hero.mission2_name': 'Rassvet-2',
-  'hero.mission2_details': '3 satellites · 800 km · 99 days',
+  "hero.label": "Russian aerospace company",
+  "hero.title":
+    "Building a low-orbit satellite system for broadband connectivity anywhere on Earth",
+  "hero.subtitle":
+    "The first and only company in Russia developing a commercial project of this scale",
+  "hero.cta_primary": "Get in touch",
+  "hero.cta_secondary": "Learn more",
+  "hero.stat_sessions": "communication sessions",
+  "hero.stat_satellites": "satellites in orbit",
+  "hero.stat_orbit": "orbital altitude",
+  "hero.mission1_name": "Rassvet-1",
+  "hero.mission1_details": "3 satellites · 550 km · 423 days",
+  "hero.mission2_name": "Rassvet-2",
+  "hero.mission2_details": "3 satellites · 800 km · 99 days",
 
-  'mission.title': 'Building boundless future connectivity for Earth',
-  'mission.spec1_value': '800 km',
-  'mission.spec1_label': 'Orbital altitude',
-  'mission.spec2_value': 'up to 1 Gbit/s',
-  'mission.spec2_label': 'Internet speed',
-  'mission.spec3_value': 'up to 70 ms',
-  'mission.spec3_label': 'Signal latency',
+  "mission.title": "Building boundless future connectivity for Earth",
+  "mission.spec1_value": "800 km",
+  "mission.spec1_label": "Orbital altitude",
+  "mission.spec2_value": "up to 1 Gbit/s",
+  "mission.spec2_label": "Internet speed",
+  "mission.spec3_value": "up to 70 ms",
+  "mission.spec3_label": "Signal latency",
 
-  'tech.label': 'Technologies',
-  'tech.1_name': 'Satellite constellation',
-  'tech.1_desc': 'Serial spacecraft interconnected via laser communication channels',
-  'tech.2_name': 'Spacecraft',
-  'tech.2_desc': 'Orbital 5G base station, up to 1 Gbit/s data throughput',
-  'tech.3_name': 'Laser communication terminal',
-  'tech.3_desc': 'Inter-satellite links enabling global coverage',
-  'tech.4_name': 'User terminal',
-  'tech.4_desc': 'Devices for stationary and mobile users',
-  'tech.5_name': 'Gateway station',
-  'tech.5_desc': 'Hardware-software complex for ground network integration',
+  "tech.label": "Technologies",
+  "tech.1_name": "Satellite constellation",
+  "tech.1_desc":
+    "Serial spacecraft interconnected via laser communication channels",
+  "tech.2_name": "Spacecraft",
+  "tech.2_desc": "Orbital 5G base station, up to 1 Gbit/s data throughput",
+  "tech.3_name": "Laser communication terminal",
+  "tech.3_desc": "Inter-satellite links enabling global coverage",
+  "tech.4_name": "User terminal",
+  "tech.4_desc": "Devices for stationary and mobile users",
+  "tech.5_name": "Gateway station",
+  "tech.5_desc": "Hardware-software complex for ground network integration",
 
-  'solutions.label': 'Solutions',
-  'solutions.title': 'Broadband internet for any industry',
-  'solutions.extractive': 'Extractive industries',
-  'solutions.geo': 'Geological survey',
-  'solutions.telecom': 'Telecom operators',
-  'solutions.aviation': 'Aviation',
-  'solutions.rail': 'Rail',
-  'solutions.maritime': 'Maritime',
-  'solutions.auto': 'Automotive',
-  'solutions.education': 'Education',
-  'solutions.health': 'Healthcare',
-  'solutions.emergency': 'Emergency services',
-  'solutions.gov': 'Regional government',
+  "solutions.label": "Solutions",
+  "solutions.title": "Broadband internet for any industry",
+  "solutions.extractive": "Extractive industries",
+  "solutions.geo": "Geological survey",
+  "solutions.telecom": "Telecom operators",
+  "solutions.aviation": "Aviation",
+  "solutions.rail": "Rail",
+  "solutions.maritime": "Maritime",
+  "solutions.auto": "Automotive",
+  "solutions.education": "Education",
+  "solutions.health": "Healthcare",
+  "solutions.emergency": "Emergency services",
+  "solutions.gov": "Regional government",
 
-  'timeline.label': 'Timeline',
-  'timeline.future': 'Target',
+  "timeline.label": "Timeline",
+  "timeline.future": "Target",
 
-  'team.label': 'Team',
-  'team.title': 'Young professionals from aerospace, IT and telecom',
-  'team.stat_count': '~3,000 employees',
-  'team.stat_engineers': '80% — engineers, designers, software developers',
-  'team.cta': 'Join us',
+  "team.label": "Team",
+  "team.title": "Young professionals from aerospace, IT and telecom",
+  "team.stat_count": "~3,000 employees",
+  "team.stat_engineers": "80% — engineers, designers, software developers",
+  "team.cta": "Join us",
 
-  'why.label': 'Why 1440',
-  'why.text': 'In its first day in orbit, Sputnik-1 completed exactly 1,440 revolutions. That number became a symbol of our heritage and the starting point of a new era in Russian space communications.',
+  "why.label": "Why 1440?",
+  "why.text":
+    "In its first day in orbit, Sputnik-1 completed exactly 1,440 revolutions. That number became a symbol of our heritage and the starting point of a new era in Russian space communications.",
 
-  'form.label': 'Contact',
-  'form.title': 'Ready to work together?',
-  'form.name': 'First name',
-  'form.surname': 'Last name',
-  'form.company': 'Company',
-  'form.position': 'Position',
-  'form.email': 'Email',
-  'form.message': 'Request description',
-  'form.consent': 'I agree to the processing of my personal data',
-  'form.submit': 'Submit',
-  'form.success_title': 'Thank you',
-  'form.success_text': 'We have received your request and will be in touch shortly.',
+  "form.label": "Contact",
+  "form.title": "Ready to work together?",
+  "form.name": "First name",
+  "form.surname": "Last name",
+  "form.company": "Company",
+  "form.position": "Position",
+  "form.email": "Email",
+  "form.message": "Request description",
+  "form.consent": "I agree to the processing of my personal data",
+  "form.submit": "Submit",
+  "form.success_title": "Thank you",
+  "form.success_text":
+    "We have received your request and will be in touch shortly.",
 
-  'footer.contacts': 'Contacts',
-  'footer.address': 'Address',
-  'footer.docs': 'Legal',
-  'footer.doc1': 'User agreement',
-  'footer.doc2': 'Privacy policy',
-  'footer.doc3': 'Candidate data processing policy',
-  'footer.doc4': 'Personnel reserve policy',
-  'footer.doc5': 'IT certification',
+  "footer.contacts": "Contacts",
+  "footer.address": "Address",
+  "footer.docs": "Legal",
+  "footer.doc1": "User agreement",
+  "footer.doc2": "Privacy policy",
+  "footer.doc3": "Candidate data processing policy",
+  "footer.doc4": "Personnel reserve policy",
+  "footer.doc5": "IT certification",
 } as const;
 ```
 
@@ -567,19 +589,19 @@ export const en = {
 
 ```ts
 // src/i18n/utils.ts
-import { ru, type TranslationKey } from './ru';
-import { en } from './en';
+import { ru, type TranslationKey } from "./ru";
+import { en } from "./en";
 
-export type Lang = 'ru' | 'en';
+export type Lang = "ru" | "en";
 
-const LANGS: Lang[] = ['ru', 'en'];
+const LANGS: Lang[] = ["ru", "en"];
 
 const translations: Record<Lang, typeof ru> = { ru, en: en as typeof ru };
 
 export function getLangFromUrl(url: URL): Lang {
-  const [, first] = url.pathname.split('/');
+  const [, first] = url.pathname.split("/");
   if ((LANGS as string[]).includes(first)) return first as Lang;
-  return 'ru';
+  return "ru";
 }
 
 export function useTranslations(lang: Lang) {
@@ -588,8 +610,8 @@ export function useTranslations(lang: Lang) {
   };
 }
 
-export function getLocalePath(lang: Lang, path = ''): string {
-  return lang === 'ru' ? `/${path}` : `/en/${path}`;
+export function getLocalePath(lang: Lang, path = ""): string {
+  return lang === "ru" ? `/${path}` : `/en/${path}`;
 }
 ```
 
@@ -613,6 +635,7 @@ git commit -m "feat: add i18n with ru/en translations and utils"
 ## Task 4: Layout.astro
 
 **Files:**
+
 - Create: `src/layouts/Layout.astro`
 
 - [ ] **Step 1: Write Layout.astro**
@@ -668,6 +691,7 @@ git commit -m "feat: add layout with SEO meta tags"
 ## Task 5: Nav.astro
 
 **Files:**
+
 - Create: `src/components/Nav.astro`
 
 - [ ] **Step 1: Write Nav.astro**
@@ -854,6 +878,7 @@ git commit -m "feat: add sticky nav with blur effect and i18n"
 ## Task 6: OrbitalData.ts
 
 **Files:**
+
 - Create: `src/components/globe/OrbitalData.ts`
 - Create: `src/components/globe/OrbitalData.test.ts`
 
@@ -861,23 +886,23 @@ git commit -m "feat: add sticky nav with blur effect and i18n"
 
 ```ts
 // src/components/globe/OrbitalData.test.ts
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect } from "vitest";
 import {
   latLonToVector3,
   generateOrbit,
   generateArcPoints,
   SATELLITES,
-} from './OrbitalData';
+} from "./OrbitalData";
 
-describe('latLonToVector3', () => {
-  it('converts equatorial point correctly', () => {
+describe("latLonToVector3", () => {
+  it("converts equatorial point correctly", () => {
     const v = latLonToVector3(0, 0, 1);
     expect(v[0]).toBeCloseTo(1, 5);
     expect(v[1]).toBeCloseTo(0, 5);
     expect(v[2]).toBeCloseTo(0, 5);
   });
 
-  it('converts north pole correctly', () => {
+  it("converts north pole correctly", () => {
     const v = latLonToVector3(90, 0, 1);
     expect(v[0]).toBeCloseTo(0, 5);
     expect(v[1]).toBeCloseTo(1, 5);
@@ -885,18 +910,28 @@ describe('latLonToVector3', () => {
   });
 });
 
-describe('generateOrbit', () => {
-  it('returns array of 3D points', () => {
-    const points = generateOrbit({ altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 0, steps: 64 });
+describe("generateOrbit", () => {
+  it("returns array of 3D points", () => {
+    const points = generateOrbit({
+      altitudeKm: 550,
+      inclinationDeg: 97.5,
+      raanDeg: 0,
+      steps: 64,
+    });
     expect(points).toHaveLength(64);
     expect(points[0]).toHaveLength(3);
   });
 
-  it('all orbit points at roughly correct radius', () => {
+  it("all orbit points at roughly correct radius", () => {
     const EARTH_R = 1;
     const ALT = 550 / 6371;
     const R = EARTH_R + ALT;
-    const points = generateOrbit({ altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 0, steps: 32 });
+    const points = generateOrbit({
+      altitudeKm: 550,
+      inclinationDeg: 97.5,
+      raanDeg: 0,
+      steps: 32,
+    });
     for (const p of points) {
       const r = Math.sqrt(p[0] ** 2 + p[1] ** 2 + p[2] ** 2);
       expect(r).toBeCloseTo(R, 3);
@@ -904,15 +939,15 @@ describe('generateOrbit', () => {
   });
 });
 
-describe('generateArcPoints', () => {
-  it('generates arc between two points', () => {
+describe("generateArcPoints", () => {
+  it("generates arc between two points", () => {
     const arc = generateArcPoints([0, 1, 0], [1, 0, 0], 0.3, 32);
     expect(arc.length).toBe(32);
   });
 });
 
-describe('SATELLITES', () => {
-  it('has 6 satellites', () => {
+describe("SATELLITES", () => {
+  it("has 6 satellites", () => {
     expect(SATELLITES).toHaveLength(6);
   });
 });
@@ -949,14 +984,19 @@ export function latLonToVector3(lat: number, lon: number, radius = 1): Vec3 {
   const theta = (lon + 180) * (Math.PI / 180);
   return [
     -radius * Math.sin(phi) * Math.cos(theta),
-     radius * Math.cos(phi),
-     radius * Math.sin(phi) * Math.sin(theta),
+    radius * Math.cos(phi),
+    radius * Math.sin(phi) * Math.sin(theta),
   ];
 }
 
 /** Generate orbital ring points in 3D space.
  *  Returns array of Vec3 at (1 + altitudeKm/EARTH_R) radius. */
-export function generateOrbit({ altitudeKm, inclinationDeg, raanDeg, steps }: OrbitalParams): Vec3[] {
+export function generateOrbit({
+  altitudeKm,
+  inclinationDeg,
+  raanDeg,
+  steps,
+}: OrbitalParams): Vec3[] {
   const r = 1 + altitudeKm / EARTH_RADIUS_KM;
   const inc = inclinationDeg * (Math.PI / 180);
   const raan = raanDeg * (Math.PI / 180);
@@ -986,7 +1026,12 @@ export function generateOrbit({ altitudeKm, inclinationDeg, raanDeg, steps }: Or
 
 /** Generate arc points between two Vec3 points on a sphere,
  *  elevating the midpoint by `arcHeight` for a parabolic arc effect. */
-export function generateArcPoints(start: Vec3, end: Vec3, arcHeight: number, steps: number): Vec3[] {
+export function generateArcPoints(
+  start: Vec3,
+  end: Vec3,
+  arcHeight: number,
+  steps: number,
+): Vec3[] {
   const points: Vec3[] = [];
   for (let i = 0; i < steps; i++) {
     const t = i / (steps - 1);
@@ -997,7 +1042,11 @@ export function generateArcPoints(start: Vec3, end: Vec3, arcHeight: number, ste
     // Normalise and add arc height (sin curve peaks at midpoint)
     const len = Math.sqrt(x * x + y * y + z * z);
     const elevation = 1 + arcHeight * Math.sin(Math.PI * t);
-    points.push([x / len * elevation, y / len * elevation, z / len * elevation]);
+    points.push([
+      (x / len) * elevation,
+      (y / len) * elevation,
+      (z / len) * elevation,
+    ]);
   }
   return points;
 }
@@ -1007,13 +1056,13 @@ export function generateArcPoints(start: Vec3, end: Vec3, arcHeight: number, ste
  *  Rassvet-2: 3 sats at 800 km, ~98.6° SSO */
 export const SATELLITES = [
   // Rassvet-1 (550 km SSO)
-  { name: 'R1-A', altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 0 },
-  { name: 'R1-B', altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 120 },
-  { name: 'R1-C', altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 240 },
+  { name: "R1-A", altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 0 },
+  { name: "R1-B", altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 120 },
+  { name: "R1-C", altitudeKm: 550, inclinationDeg: 97.5, raanDeg: 240 },
   // Rassvet-2 (800 km SSO)
-  { name: 'R2-A', altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 60 },
-  { name: 'R2-B', altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 180 },
-  { name: 'R2-C', altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 300 },
+  { name: "R2-A", altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 60 },
+  { name: "R2-B", altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 180 },
+  { name: "R2-C", altitudeKm: 800, inclinationDeg: 98.6, raanDeg: 300 },
 ] as const;
 ```
 
@@ -1037,6 +1086,7 @@ git commit -m "feat: add orbital math and satellite data"
 ## Task 7: GlobeRenderer.ts
 
 **Files:**
+
 - Create: `src/components/globe/GlobeRenderer.ts`
 
 > Note: Three.js WebGL cannot be unit-tested in Node. This module is tested visually in the browser.
@@ -1045,8 +1095,8 @@ git commit -m "feat: add orbital math and satellite data"
 
 ```ts
 // src/components/globe/GlobeRenderer.ts
-import * as THREE from 'three';
-import { generateOrbit, SATELLITES, type Vec3 } from './OrbitalData';
+import * as THREE from "three";
+import { generateOrbit, SATELLITES, type Vec3 } from "./OrbitalData";
 
 const GLOBE_RADIUS = 1;
 const DOT_COUNT = 12000;
@@ -1070,15 +1120,29 @@ export class GlobeRenderer {
   private orbitLines: THREE.Group;
   private satDots: THREE.Group;
   private animId = 0;
-  private fpsMonitor: FpsMonitor = { frameCount: 0, lastTime: 0, fps: 60, level: 0 };
+  private fpsMonitor: FpsMonitor = {
+    frameCount: 0,
+    lastTime: 0,
+    fps: 60,
+    level: 0,
+  };
 
   constructor(private canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true });
+    this.renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: false,
+      alpha: true,
+    });
     this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     this.renderer.setClearColor(0x000000, 0);
 
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+    this.camera = new THREE.PerspectiveCamera(
+      45,
+      canvas.clientWidth / canvas.clientHeight,
+      0.1,
+      100,
+    );
     this.camera.position.set(0, 0, 3);
 
     this.globe = this.createGlobeSphere();
@@ -1098,19 +1162,26 @@ export class GlobeRenderer {
     this.scene.add(new THREE.AmbientLight(0xffffff, 0.1));
 
     this.onResize();
-    window.addEventListener('resize', this.onResize);
+    window.addEventListener("resize", this.onResize);
   }
 
   private createGlobeSphere(): THREE.Mesh {
     const geo = new THREE.SphereGeometry(GLOBE_RADIUS, 64, 64);
-    const mat = new THREE.MeshBasicMaterial({ color: 0x0a0e14, transparent: true, opacity: 0.95 });
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x0a0e14,
+      transparent: true,
+      opacity: 0.95,
+    });
     return new THREE.Mesh(geo, mat);
   }
 
   private createDotPlaceholder(): THREE.InstancedMesh {
     // Placeholder while world map loads — evenly distributed dots
     const geo = new THREE.CircleGeometry(DOT_SIZE, 5);
-    const mat = new THREE.MeshBasicMaterial({ color: 0x334155, side: THREE.DoubleSide });
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0x334155,
+      side: THREE.DoubleSide,
+    });
     const mesh = new THREE.InstancedMesh(geo, mat, DOT_COUNT);
     const dummy = new THREE.Object3D();
     for (let i = 0; i < DOT_COUNT; i++) {
@@ -1132,17 +1203,17 @@ export class GlobeRenderer {
 
   async loadWorldMap(url: string): Promise<void> {
     const img = new Image();
-    img.crossOrigin = 'anonymous';
+    img.crossOrigin = "anonymous";
     await new Promise<void>((res, rej) => {
       img.onload = () => res();
       img.onerror = rej;
       img.src = url;
     });
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = img.width;
     canvas.height = img.height;
-    const ctx = canvas.getContext('2d')!;
+    const ctx = canvas.getContext("2d")!;
     ctx.drawImage(img, 0, 0);
     const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
@@ -1169,15 +1240,20 @@ export class GlobeRenderer {
       const theta = (lon + 180) * (Math.PI / 180);
       const pos: Vec3 = [
         -GLOBE_RADIUS * Math.sin(phi) * Math.cos(theta),
-         GLOBE_RADIUS * Math.cos(phi),
-         GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
+        GLOBE_RADIUS * Math.cos(phi),
+        GLOBE_RADIUS * Math.sin(phi) * Math.sin(theta),
       ];
       positions.push(pos);
       placed++;
     }
 
     const geo = new THREE.CircleGeometry(DOT_SIZE, 5);
-    const mat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, opacity: 0.7, transparent: true });
+    const mat = new THREE.MeshBasicMaterial({
+      color: 0xffffff,
+      side: THREE.DoubleSide,
+      opacity: 0.7,
+      transparent: true,
+    });
     const newMesh = new THREE.InstancedMesh(geo, mat, positions.length);
 
     for (let i = 0; i < positions.length; i++) {
@@ -1201,20 +1277,26 @@ export class GlobeRenderer {
     this.orbitLines.clear();
     this.satDots.clear();
 
-    const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.25 });
+    const lineMat = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.25,
+    });
     const satGeo = new THREE.SphereGeometry(0.012, 8, 8);
     const satMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 
     for (const sat of SATELLITES) {
       const points = generateOrbit({ ...sat, steps: ORBIT_STEPS });
-      const verts = new Float32Array(points.flatMap(p => p));
+      const verts = new Float32Array(points.flatMap((p) => p));
       const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+      geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
 
       // Close loop
       const loopGeo = new THREE.BufferGeometry();
-      const loopVerts = new Float32Array([...points, points[0]!].flatMap(p => p));
-      loopGeo.setAttribute('position', new THREE.BufferAttribute(loopVerts, 3));
+      const loopVerts = new Float32Array(
+        [...points, points[0]!].flatMap((p) => p),
+      );
+      loopGeo.setAttribute("position", new THREE.BufferAttribute(loopVerts, 3));
 
       this.orbitLines.add(new THREE.Line(loopGeo, lineMat));
 
@@ -1222,8 +1304,8 @@ export class GlobeRenderer {
       const [sx, sy, sz] = points[0]!;
       const satMesh = new THREE.Mesh(satGeo, satMat);
       satMesh.position.set(sx, sy, sz);
-      satMesh.userData['orbitPoints'] = points;
-      satMesh.userData['orbitIndex'] = Math.floor(Math.random() * ORBIT_STEPS);
+      satMesh.userData["orbitPoints"] = points;
+      satMesh.userData["orbitIndex"] = Math.floor(Math.random() * ORBIT_STEPS);
       this.satDots.add(satMesh);
     }
   }
@@ -1270,7 +1352,9 @@ export class GlobeRenderer {
       if (this.fpsMonitor.fps < 55 && this.fpsMonitor.level < 3) {
         this.fpsMonitor.level++;
         const reduction = 1 - this.fpsMonitor.level * 0.2;
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2) * reduction);
+        this.renderer.setPixelRatio(
+          Math.min(window.devicePixelRatio, 2) * reduction,
+        );
       }
     }
   }
@@ -1290,9 +1374,9 @@ export class GlobeRenderer {
       // Animate satellite positions along orbits
       for (const child of this.satDots.children) {
         const mesh = child as THREE.Mesh;
-        const pts = mesh.userData['orbitPoints'] as Vec3[];
-        const idx = (mesh.userData['orbitIndex'] as number + 1) % pts.length;
-        mesh.userData['orbitIndex'] = idx;
+        const pts = mesh.userData["orbitPoints"] as Vec3[];
+        const idx = ((mesh.userData["orbitIndex"] as number) + 1) % pts.length;
+        mesh.userData["orbitIndex"] = idx;
         const [x, y, z] = pts[idx]!;
         mesh.position.set(x, y, z);
       }
@@ -1309,7 +1393,7 @@ export class GlobeRenderer {
 
   destroy(): void {
     this.stop();
-    window.removeEventListener('resize', this.onResize);
+    window.removeEventListener("resize", this.onResize);
     this.renderer.dispose();
   }
 }
@@ -1327,6 +1411,7 @@ git commit -m "feat: add Three.js globe renderer with instanced dots and orbit a
 ## Task 8: Globe.astro + SVG placeholder
 
 **Files:**
+
 - Create: `src/components/Globe.astro`
 
 - [ ] **Step 1: Write Globe.astro**
@@ -1457,6 +1542,7 @@ git commit -m "feat: add globe component with SVG placeholder and lazy WebGL cro
 ## Task 9: Hero.astro
 
 **Files:**
+
 - Create: `src/components/Hero.astro`
 
 - [ ] **Step 1: Write Hero.astro**
@@ -1649,6 +1735,7 @@ git commit -m "feat: add hero section with split layout"
 ## Task 10: Mission.astro
 
 **Files:**
+
 - Create: `src/components/Mission.astro`
 
 - [ ] **Step 1: Write Mission.astro**
@@ -1758,6 +1845,7 @@ git commit -m "feat: add mission section with specs"
 ## Task 11: Technologies.astro (horizontal pin-scroll)
 
 **Files:**
+
 - Create: `src/components/Technologies.astro`
 
 - [ ] **Step 1: Write Technologies.astro**
@@ -1925,6 +2013,7 @@ git commit -m "feat: add technologies with horizontal pin-scroll"
 ## Task 12: Solutions.astro
 
 **Files:**
+
 - Create: `src/components/Solutions.astro`
 
 - [ ] **Step 1: Write Solutions.astro**
@@ -2025,6 +2114,7 @@ git commit -m "feat: add solutions grid"
 ## Task 13: Timeline.astro
 
 **Files:**
+
 - Create: `src/components/Timeline.astro`
 
 - [ ] **Step 1: Write Timeline.astro**
@@ -2213,6 +2303,7 @@ git commit -m "feat: add timeline with scroll-drawn SVG line"
 ## Task 14: Team.astro
 
 **Files:**
+
 - Create: `src/components/Team.astro`
 
 - [ ] **Step 1: Write Team.astro**
@@ -2353,6 +2444,7 @@ git commit -m "feat: add team section with carousel"
 ## Task 15: Why1440.astro + ContactForm.astro + Footer.astro
 
 **Files:**
+
 - Create: `src/components/Why1440.astro`
 - Create: `src/components/ContactForm.astro`
 - Create: `src/components/Footer.astro`
@@ -2721,6 +2813,7 @@ git commit -m "feat: add why1440, contact form, and footer"
 ## Task 16: Scroll animations (GSAP)
 
 **Files:**
+
 - Create: `src/scripts/animations.ts`
 
 - [ ] **Step 1: Write animations.ts**
@@ -2730,17 +2823,17 @@ git commit -m "feat: add why1440, contact form, and footer"
 // Lazy-loaded on first scroll via IntersectionObserver in pages
 
 export async function initAnimations() {
-  const { gsap } = await import('gsap');
-  const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+  const { gsap } = await import("gsap");
+  const { ScrollTrigger } = await import("gsap/ScrollTrigger");
   gsap.registerPlugin(ScrollTrigger);
 
   // Hero entrance (immediate, not scroll)
-  gsap.to('[data-animate]', {
+  gsap.to("[data-animate]", {
     opacity: 1,
     y: 0,
     duration: 0.8,
     stagger: 0.12,
-    ease: 'power3.out',
+    ease: "power3.out",
     delay: 0.2,
   });
 
@@ -2748,44 +2841,49 @@ export async function initAnimations() {
     opacity: 1,
     duration: 0.8,
     stagger: 0.1,
-    ease: 'power2.out',
+    ease: "power2.out",
     delay: 0.5,
   });
 
   // All other [data-animate] elements driven by scroll
-  document.querySelectorAll<HTMLElement>('[data-animate]').forEach((el) => {
+  document.querySelectorAll<HTMLElement>("[data-animate]").forEach((el) => {
     // Skip hero elements (already animated above)
-    if (el.closest('#hero')) return;
+    if (el.closest("#hero")) return;
 
     ScrollTrigger.create({
       trigger: el,
-      start: 'top 85%',
+      start: "top 85%",
       onEnter: () => {
         gsap.to(el, {
           opacity: 1,
           y: 0,
           duration: 0.7,
-          ease: 'power3.out',
+          ease: "power3.out",
         });
       },
     });
   });
 
   // Count-up for stat numbers
-  document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
-    const target = parseInt(el.dataset['count']!, 10);
+  document.querySelectorAll<HTMLElement>("[data-count]").forEach((el) => {
+    const target = parseInt(el.dataset["count"]!, 10);
     ScrollTrigger.create({
       trigger: el,
-      start: 'top 90%',
+      start: "top 90%",
       onEnter: () => {
-        gsap.to({ val: 0 }, {
-          val: target,
-          duration: 1.5,
-          ease: 'power2.out',
-          onUpdate: function () {
-            el.textContent = Math.floor(this.targets()[0].val).toLocaleString('ru-RU');
+        gsap.to(
+          { val: 0 },
+          {
+            val: target,
+            duration: 1.5,
+            ease: "power2.out",
+            onUpdate: function () {
+              el.textContent = Math.floor(this.targets()[0].val).toLocaleString(
+                "ru-RU",
+              );
+            },
           },
-        });
+        );
       },
     });
   });
@@ -2804,6 +2902,7 @@ git commit -m "feat: add scroll animations with GSAP"
 ## Task 17: Pages
 
 **Files:**
+
 - Create: `src/pages/index.astro`
 - Create: `src/pages/en/index.astro`
 
@@ -2945,6 +3044,7 @@ git commit -m "feat: add ru and en pages"
 ## Task 18: Build and Lighthouse audit
 
 **Files:**
+
 - Modify: `src/components/Globe.astro` (if optimizations needed)
 - Modify: `astro.config.mjs` (if compression needed)
 
@@ -2964,14 +3064,17 @@ Target scores: Performance ≥ 90, Accessibility ≥ 90, Best Practices ≥ 90, 
 - [ ] **Step 3: Fix common issues**
 
 **If LCP is poor** (globe blocks LCP):
+
 - Confirm SVG placeholder loads before Three.js.
 - Add `fetchpriority="high"` to the SVG element in Globe.astro if needed.
 
 **If TBT/FID is poor** (JS blocking main thread):
+
 - Confirm GSAP and Three.js are only loaded via dynamic import.
 - Add `type="module"` to inline scripts if missing.
 
 **If Accessibility < 90:**
+
 - Add missing `alt` attributes.
 - Ensure form labels are correctly associated.
 - Check colour contrast: white on #0f1011 = 17:1 (passes AAA).
@@ -2991,26 +3094,26 @@ git commit -m "perf: lighthouse optimizations"
 
 **Spec coverage check:**
 
-| Spec requirement | Task |
-|---|---|
-| Astro framework | Task 1 |
-| Three.js GitHub-style globe | Tasks 6–8 |
-| SVG placeholder + crossfade | Task 8 |
-| FPS degradation | Task 7 (GlobeRenderer) |
-| GSAP scroll animations | Tasks 11, 13, 16 |
-| Apple-style horizontal pin scroll | Task 11 |
-| Timeline draw-on-scroll | Task 13 |
-| Design system #0f1011 / white / #858585 | Task 2 |
-| Primary / secondary buttons | Task 2 |
-| Logo SVGs from CDN | Task 1 |
-| Nav sticky + blur | Task 5 |
-| ru/en i18n | Tasks 3, 17 |
-| All 9 sections | Tasks 9–15, 17 |
-| All 5 technologies | Tasks 3, 11 |
-| All 11 solutions | Tasks 3, 12 |
-| All 9 timeline events | Task 13 |
-| Contact form with all fields | Task 15 |
-| Footer with all contacts + docs | Task 15 |
-| Lighthouse 90+ strategy | Tasks 1, 7, 8, 18 |
+| Spec requirement                        | Task                   |
+| --------------------------------------- | ---------------------- |
+| Astro framework                         | Task 1                 |
+| Three.js GitHub-style globe             | Tasks 6–8              |
+| SVG placeholder + crossfade             | Task 8                 |
+| FPS degradation                         | Task 7 (GlobeRenderer) |
+| GSAP scroll animations                  | Tasks 11, 13, 16       |
+| Apple-style horizontal pin scroll       | Task 11                |
+| Timeline draw-on-scroll                 | Task 13                |
+| Design system #0f1011 / white / #858585 | Task 2                 |
+| Primary / secondary buttons             | Task 2                 |
+| Logo SVGs from CDN                      | Task 1                 |
+| Nav sticky + blur                       | Task 5                 |
+| ru/en i18n                              | Tasks 3, 17            |
+| All 9 sections                          | Tasks 9–15, 17         |
+| All 5 technologies                      | Tasks 3, 11            |
+| All 11 solutions                        | Tasks 3, 12            |
+| All 9 timeline events                   | Task 13                |
+| Contact form with all fields            | Task 15                |
+| Footer with all contacts + docs         | Task 15                |
+| Lighthouse 90+ strategy                 | Tasks 1, 7, 8, 18      |
 
 All requirements covered. ✓

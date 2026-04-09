@@ -75,20 +75,6 @@ export const en = {
   "why.text":
     "In its first day in orbit, Sputnik-1 completed exactly 1,440 revolutions. That number became a symbol of our heritage and the starting point of a new era in Russian space communications.",
 
-  "form.label": "Contact",
-  "form.title": "Ready to work together?",
-  "form.name": "First name",
-  "form.surname": "Last name",
-  "form.company": "Company",
-  "form.position": "Position",
-  "form.email": "Email",
-  "form.message": "Request description",
-  "form.consent": "I agree to the processing of my personal data",
-  "form.submit": "Submit",
-  "form.success_title": "Thank you",
-  "form.success_text":
-    "We have received your request and will be in touch shortly.",
-
   "footer.contacts": "Contacts",
   "footer.address": "Address",
   "footer.docs": "Legal",

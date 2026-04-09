@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Solutions — варианты лейаута</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, sans-serif; background: #0a0a0a; color: #fff; }
+
+  .page-header {
+    padding: 32px 48px 24px;
+    border-bottom: 1px solid #222;
+  }
+  .page-header h1 { font-size: 18px; font-weight: 600; color: #fff; }
+  .page-header p { font-size: 13px; color: #888; margin-top: 4px; }
+
+  .options-row {
+    display: flex;
+    gap: 24px;
+    padding: 32px 48px;
+    align-items: stretch;
+  }
+
+  .option-card {
+    flex: 1;
+    border: 2px solid #222;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, transform 0.2s;
+    background: #111;
+  }
+  .option-card:hover { border-color: #555; transform: translateY(-2px); }
+  .option-card.selected { border-color: #4f8ef7; }
+
+  .option-label {
+    padding: 16px 20px 12px;
+    border-bottom: 1px solid #1e1e1e;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .option-letter {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #222;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .option-card.selected .option-letter { background: #4f8ef7; }
+  .option-title { font-size: 14px; font-weight: 600; }
+  .option-desc { font-size: 12px; color: #666; line-height: 1.5; padding: 12px 20px 16px; }
+
+  .mockup { width: 100%; height: 320px; position: relative; overflow: hidden; }
+
+  /* ─── A: Full-bleed background ─── */
+  .mockup-a {
+    background: url('https://1440.space/wp-content/uploads/2024/07/emanuviews-AKYjr-kmYtQ-unsplash-1-1_1-scaled.webp') center/cover;
+  }
+  .mockup-a .overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.82) 40%, rgba(0,0,0,0.3));
+  }
+  .mockup-a .content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 28px;
+    gap: 8px;
+  }
+  .mockup-a .sec-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; }
+  .mockup-a .sec-title { font-size: 18px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .mockup-a .list { display: flex; flex-direction: column; gap: 3px; }
+  .mockup-a .list-item {
+    font-size: 11px; padding: 7px 10px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; transition: background 0.15s;
+    color: #ccc;
+  }
+  .mockup-a .list-item.active {
+    background: rgba(255,255,255,0.12);
+    color: #fff; font-weight: 600;
+  }
+  .mockup-a .list-item .arrow { color: #666; font-size: 10px; }
+  .mockup-a .list-item.active .arrow { color: #fff; }
+
+  /* ─── B: Split layout ─── */
+  .mockup-b { display: flex; }
+  .mockup-b .left {
+    width: 42%; background: #111;
+    padding: 24px 20px;
+    display: flex; flex-direction: column; gap: 6px;
+    border-right: 1px solid #222;
+  }
+  .mockup-b .b-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.12em; color: #888; margin-bottom: 4px; }
+  .mockup-b .b-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; letter-spacing: -0.02em; }
+  .mockup-b .b-item {
+    font-size: 11px; padding: 8px 10px; border-radius: 4px;
+    display: flex; align-items: center; justify-content: space-between;
+    color: #aaa; cursor: pointer;
+  }
+  .mockup-b .b-item.active {
+    background: #1e1e1e; color: #fff; font-weight: 600;
+  }
+  .mockup-b .b-item .arrow { font-size: 10px; color: #555; }
+  .mockup-b .b-item.active .arrow { color: #fff; }
+  .mockup-b .right {
+    flex: 1;
+    background: url('https://1440.space/wp-content/uploads/2024/07/emanuviews-AKYjr-kmYtQ-unsplash-1-1_1-scaled.webp') center/cover;
+    position: relative;
+  }
+  .mockup-b .right-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.1) 100%);
+    display: flex; flex-direction: column; justify-content: flex-end; padding: 20px;
+  }
+  .mockup-b .active-name { font-size: 13px; font-weight: 700; }
+  .mockup-b .active-tag { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #aaa; margin-top: 3px; }
+
+  /* ─── C: Accordion / stacked strips ─── */
+  .mockup-c { display: flex; flex-direction: column; }
+  .mockup-c .strip {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    border-bottom: 1px solid #1a1a1a;
+    transition: flex 0.4s ease;
+    cursor: pointer;
+    min-height: 28px;
+  }
+  .mockup-c .strip.active { flex: 5; }
+  .mockup-c .strip-bg {
+    position: absolute; inset: 0;
+    background-size: cover; background-position: center;
+    opacity: 0.3; transition: opacity 0.3s;
+  }
+  .mockup-c .strip.active .strip-bg { opacity: 1; }
+  .mockup-c .strip-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to right, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 100%);
+  }
+  .mockup-c .strip-content {
+    position: relative; z-index: 1;
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 8px; height: 100%;
+  }
+  .mockup-c .strip-name { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; white-space: nowrap; }
+  .mockup-c .strip-arrow { font-size: 9px; color: #888; }
+  .mockup-c .strip.active .strip-name { font-size: 13px; }
+  .mockup-c .strip.active .strip-arrow { color: #fff; }
+
+  .footer-note {
+    padding: 0 48px 32px;
+    font-size: 12px; color: #555;
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Solutions — варианты лейаута</h1>
+  <p>Выбери подход, который больше нравится. Кликни на карточку.</p>
+</div>
+
+<div class="options-row">
+
+  <!-- A: Full-bleed background -->
+  <div class="option-card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="option-label">
+      <div class="option-letter">A</div>
+      <div>
+        <div class="option-title">Full-bleed background</div>
+      </div>
+    </div>
+    <div class="mockup mockup-a">
+      <div class="overlay"></div>
+      <div class="content">
+        <span class="sec-label">Solutions</span>
+        <span class="sec-title">Широкополосный<br>интернет для отрасли</span>
+        <div class="list">
+          <div class="list-item">Добывающие компании <span class="arrow">→</span></div>
+          <div class="list-item">Геологоразведка <span class="arrow">→</span></div>
+          <div class="list-item">Операторы связи <span class="arrow">→</span></div>
+          <div class="list-item active">Авиация <span class="arrow">→</span></div>
+          <div class="list-item">Ж/Д <span class="arrow">→</span></div>
+          <div class="list-item">Судоходство <span class="arrow">→</span></div>
+          <div class="list-item">Автомобильный транспорт <span class="arrow">→</span></div>
+        </div>
+      </div>
+    </div>
+    <p class="option-desc">Список решений слева, фоновое изображение — на весь экран. Hover/выбор меняет фото с кроссфейдом. Кинематографично, всё в одном вьюпорте.</p>
+  </div>
+
+  <!-- B: Split layout -->
+  <div class="option-card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="option-label">
+      <div class="option-letter">B</div>
+      <div>
+        <div class="option-title">Split layout</div>
+      </div>
+    </div>
+    <div class="mockup mockup-b">
+      <div class="left">
+        <div class="b-label">Solutions</div>
+        <div class="b-title">Для любой отрасли</div>
+        <div class="b-item">Добывающие <span class="arrow">→</span></div>
+        <div class="b-item">Геологоразведка <span class="arrow">→</span></div>
+        <div class="b-item">Операторы связи <span class="arrow">→</span></div>
+        <div class="b-item active">Авиация <span class="arrow">→</span></div>
+        <div class="b-item">Ж/Д <span class="arrow">→</span></div>
+        <div class="b-item">Судоходство <span class="arrow">→</span></div>
+        <div class="b-item">Автотранспорт <span class="arrow">→</span></div>
+      </div>
+      <div class="right">
+        <div class="right-overlay">
+          <div class="active-name">Авиация</div>
+          <div class="active-tag">Для транспорта</div>
+        </div>
+      </div>
+    </div>
+    <p class="option-desc">Левая колонка — список, правая — большое фото активного пункта. Классический паттерн, предсказуемый UX. Хорошо на широких экранах.</p>
+  </div>
+
+  <!-- C: Accordion strips -->
+  <div class="option-card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="option-label">
+      <div class="option-letter">C</div>
+      <div>
+        <div class="option-title">Accordion strips</div>
+      </div>
+    </div>
+    <div class="mockup mockup-c">
+      <div class="strip" style="">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/07/beth-macdonald-6iop1mRioDk-unsplash-1-min-p-2600-scaled.jpg')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Добывающие</span><span class="strip-arrow">→</span></div>
+      </div>
+      <div class="strip" style="">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/08/bernd-dittrich-Rhssxj7XH4o-unsplash-1.png')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Геологоразведка</span><span class="strip-arrow">→</span></div>
+      </div>
+      <div class="strip" style="">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/07/ariane-hackbart-LqNazx_i4UY-unsplash-1-min-p-2600-scaled.jpg')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Операторы связи</span><span class="strip-arrow">→</span></div>
+      </div>
+      <div class="strip active">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/07/emanuviews-AKYjr-kmYtQ-unsplash-1-1_1-scaled.webp')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Авиация</span><span class="strip-arrow">→</span></div>
+      </div>
+      <div class="strip" style="">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/08/E2777B09B8BC716877DD2F1864F23B28.png')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Ж/Д</span><span class="strip-arrow">→</span></div>
+      </div>
+      <div class="strip" style="">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/08/tomas-williams-p-_RJY6hN3E-unsplash-1-1_1-scaled.webp')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Судоходство</span><span class="strip-arrow">→</span></div>
+      </div>
+      <div class="strip" style="">
+        <div class="strip-bg" style="background-image: url('https://1440.space/wp-content/uploads/2024/08/image-2-1_1image-2-1-scaled.webp')"></div>
+        <div class="strip-overlay"></div>
+        <div class="strip-content"><span class="strip-name">Автотранспорт</span><span class="strip-arrow">→</span></div>
+      </div>
+    </div>
+    <p class="option-desc">Каждое решение — горизонтальная полоса с фото. Активная раскрывается. Все фото всегда видны. Максимально нестандартно.</p>
+  </div>
+
+</div>
+
+<div class="footer-note">
+  Все варианты предполагают hover/click для смены активного пункта + плавный переход фото.
+</div>
+
+<script>
+function toggleSelect(el) {
+  document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  // Report selection
+  if (window.__superpowers_report) {
+    window.__superpowers_report({ type: 'click', choice: el.dataset.choice, text: el.querySelector('.option-title').textContent });
+  }
+}
+</script>
+</body>
+</html>

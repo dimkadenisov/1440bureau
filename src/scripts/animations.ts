@@ -44,23 +44,6 @@ export async function initAnimations() {
       });
     });
 
-    // Count-up for stat numbers
-    document.querySelectorAll<HTMLElement>('[data-count]').forEach((el) => {
-      const target = parseInt(el.dataset['count'] ?? '0', 10);
-      ScrollTrigger.create({
-        trigger: el,
-        start: 'top 90%',
-        onEnter: () => {
-          const obj = { val: 0 };
-          gsap.to(obj, {
-            val: target,
-            duration: 1.5,
-            ease: 'power2.out',
-            onUpdate() { el.textContent = Math.floor(obj.val).toLocaleString('ru-RU'); },
-          });
-        },
-      });
-    });
   } catch (err) {
     // GSAP failed to load — elements remain visible from CSS fallback
     // Remove hidden state from animated elements

@@ -24,10 +24,7 @@
     "@types/node": "^25.5.0",
     "@types/three": "^0.183.1",
     "@vitest/coverage-v8": "^4.1.2",
-    "canvas": "^3.2.3",
-    "topojson-client": "^3.1.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.1.2",
-    "world-atlas": "^2.0.2"
+    "vitest": "^4.1.2"
   }
 }

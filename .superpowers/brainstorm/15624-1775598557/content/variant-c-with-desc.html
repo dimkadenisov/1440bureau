@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Variant C — с описаниями</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: #080808;
+  color: #fff;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-note {
+  padding: 16px 32px;
+  background: #111;
+  border-bottom: 1px solid #222;
+  font-size: 12px;
+  color: #888;
+  flex-shrink: 0;
+}
+.page-note strong { color: #fff; }
+
+.section-header {
+  padding: 32px 48px 24px;
+  flex-shrink: 0;
+}
+.section-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: #666;
+  margin-bottom: 8px;
+}
+.section-title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.accordion {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #1c1c1c;
+}
+
+.strip {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid #1c1c1c;
+  cursor: pointer;
+  flex: 0 0 52px;
+  transition: flex 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.strip.active {
+  flex: 1 1 280px;
+}
+
+/* Background image */
+.strip-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  transform: scale(1.04);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.strip.active .strip-bg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Gradient overlay */
+.strip-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    rgba(0,0,0,0.88) 0%,
+    rgba(0,0,0,0.6) 45%,
+    rgba(0,0,0,0.15) 100%
+  );
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.strip.active .strip-overlay { opacity: 1; }
+
+/* Collapsed header row */
+.strip-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  gap: 16px;
+  z-index: 2;
+  transition: background 0.3s;
+}
+.strip:not(.active):hover .strip-header {
+  background: rgba(255,255,255,0.03);
+}
+
+.strip-num {
+  font-size: 11px;
+  color: #444;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  transition: color 0.3s;
+  width: 24px;
+}
+.strip.active .strip-num { color: #888; }
+
+.strip-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  transition: color 0.3s;
+  flex: 1;
+}
+.strip.active .strip-name { color: #fff; }
+
+.strip-arrow {
+  font-size: 14px;
+  color: #333;
+  transition: color 0.3s, transform 0.4s;
+  flex-shrink: 0;
+}
+.strip.active .strip-arrow {
+  color: #fff;
+  transform: rotate(90deg);
+}
+.strip:not(.active):hover .strip-arrow { color: #666; }
+
+/* Expanded content */
+.strip-body {
+  position: absolute;
+  top: 52px; left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  display: flex;
+  align-items: flex-end;
+  padding: 0 32px 28px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.35s ease 0.1s, transform 0.35s ease 0.1s;
+  pointer-events: none;
+}
+.strip.active .strip-body {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.strip-desc {
+  max-width: 520px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.75);
+  line-height: 1.65;
+}
+</style>
+</head>
+<body>
+
+<div class="page-note">
+  <strong>Вариант C — интерактивный прототип.</strong> Кликай на любую строку чтобы раскрыть.
+</div>
+
+<div class="section-header">
+  <div class="section-label">Решения</div>
+  <div class="section-title">Широкополосный интернет<br>для любой отрасли</div>
+</div>
+
+<div class="accordion" id="accordion">
+
+  <div class="strip active" data-index="0">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/07/beth-macdonald-6iop1mRioDk-unsplash-1-min-p-2600-scaled.jpg')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">01</span>
+      <span class="strip-name">Добывающие компании</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Создаём условия для внедрения интеллектуальных систем управления добычей, удалённого мониторинга объектов и спецтранспорта, а также сервисов видеоаналитики.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="1">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/bernd-dittrich-Rhssxj7XH4o-unsplash-1.png')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">02</span>
+      <span class="strip-name">Геологоразведка</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Отправка большого массива данных с рабочих объектов в режиме реального времени, регулярное обновление и резервирование. Быстрое развёртывание и малогабаритность оборудования для полевых баз и мобильных партий.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="2">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/07/ariane-hackbart-LqNazx_i4UY-unsplash-1-min-p-2600-scaled.jpg')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">03</span>
+      <span class="strip-name">Операторы связи</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Простая и бесшовная интеграция сетей операторов связи и спутниковой группировки БЮРО 1440. Резервирование канала связи базовых станций и бесперебойная работа даже при аварийных ситуациях на проводных линиях.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="3">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/07/emanuviews-AKYjr-kmYtQ-unsplash-1-1_1-scaled.webp')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">04</span>
+      <span class="strip-name">Авиация</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Высокоскоростной доступ в сеть для пассажиров на протяжении всего полёта. Создание новых услуг по передаче служебной информации и трекингу воздушных судов.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="4">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/E2777B09B8BC716877DD2F1864F23B28.png')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">05</span>
+      <span class="strip-name">Железные дороги</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Высокое качество связи на всём протяжении маршрута поездов. Внедрение и усиление интеллектуальных транспортных систем для автоматизации процессов управления и удалённого мониторинга.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="5">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/tomas-williams-p-_RJY6hN3E-unsplash-1-1_1-scaled.webp')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">06</span>
+      <span class="strip-name">Судоходство</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Навигация, системы диспетчерского контроля и сбора данных, голосовая и видеосвязь, удалённый мониторинг и обслуживание судов.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="6">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/image-2-1_1image-2-1-scaled.webp')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">07</span>
+      <span class="strip-name">Автотранспорт</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Доступ в сеть для умного и беспилотного транспорта, связь на всех участках трассы, интернет для пассажиров и водителей во время поездок по бездорожью, навигация 24/7.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="7">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/668beb8a518a7f9ff8650798_alexander-tsang-XLoJavoj3oc-unsplash-1-min.webp')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">08</span>
+      <span class="strip-name">Образование</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Проведение онлайн-занятий, экзаменов и видеоконференций с любым количеством участников и неограниченной длительностью звонков в самых отдалённых районах вне зависимости от широты.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="8">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/668beb8a3eb580677ce34e99_english-teacher-doing-her-lessons-online-1-min-scaled.webp')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">09</span>
+      <span class="strip-name">Здравоохранение</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Телемедицина, моментальная передача данных о состоянии пациентов и обмен информацией между базами данных. Экстренный вызов воздушного транспорта для перевозки тяжелобольных.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="9">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/668bec0c908e663992ead3ce_ewr32.webp')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">10</span>
+      <span class="strip-name">МЧС</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Повышение скорости реагирования и координации оперативных служб в чрезвычайных ситуациях. Быстрое развёртывание оборудования без профильных специалистов для синхронизации действий.</p>
+    </div>
+  </div>
+
+  <div class="strip" data-index="10">
+    <div class="strip-bg" style="background-image:url('https://1440.space/wp-content/uploads/2024/08/image-35.png')"></div>
+    <div class="strip-overlay"></div>
+    <div class="strip-header">
+      <span class="strip-num">11</span>
+      <span class="strip-name">Региональные органы власти</span>
+      <span class="strip-arrow">→</span>
+    </div>
+    <div class="strip-body">
+      <p class="strip-desc">Оперативный обмен массивами информации, доступ к базам данных, организация защищённой голосовой и видеосвязи между объектами в труднодоступных районах.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.querySelectorAll('.strip').forEach(strip => {
+  strip.addEventListener('click', () => {
+    document.querySelectorAll('.strip').forEach(s => s.classList.remove('active'));
+    strip.classList.add('active');
+  });
+});
+</script>
+</body>
+</html>
