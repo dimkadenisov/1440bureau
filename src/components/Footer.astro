@@ -22,7 +22,7 @@ const docs = [
 ---
 
 <footer class="footer">
-  <div class="footer__inner section" style="padding-top:60px;padding-bottom:40px;">
+  <div class="footer__inner section">
     <div class="footer__top">
       <div class="footer__col">
         <p class="label">{t('footer.contacts')}</p>
@@ -53,7 +53,7 @@ const docs = [
     <div class="footer__bottom">
       <a href={getLocalePath(lang)} class="footer__logo">
         <img src="/logos/logo-icon.svg" alt="" width="20" height="20" />
-        <img src="/logos/logo-text.svg" alt="Бюро 1440" height="14" />
+        <img src="/logos/logo-text.svg" alt="Бюро 1440" width="116" height="14" />
       </a>
       <div class="footer__links">
         <a href="https://t.me/bureau_1440" target="_blank" rel="noopener">Telegram</a>
@@ -68,6 +68,11 @@ const docs = [
   .footer {
     border-top: 1px solid var(--color-border);
     margin-top: 40px;
+  }
+
+  .footer__inner {
+    padding-top: 60px;
+    padding-bottom: 40px;
   }
 
   .footer__top {

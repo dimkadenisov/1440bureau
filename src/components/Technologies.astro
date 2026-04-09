@@ -31,7 +31,10 @@ const techs = [1, 2, 3, 4, 5].map((n, i) => ({
         class={`tech__bg-img${i === 0 ? ' is-active' : ''}`}
         src={tech.img}
         alt=""
+        width="1920"
+        height="1080"
         loading={i === 0 ? 'eager' : 'lazy'}
+        fetchpriority={i === 0 ? 'high' : 'low'}
         data-tech-img={i}
       />
     ))}

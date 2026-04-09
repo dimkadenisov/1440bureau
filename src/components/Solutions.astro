@@ -36,7 +36,10 @@ const solutions = [
         <img
           src={desktopSrc}
           alt=""
+          width="1920"
+          height="1080"
           loading={i === 0 ? 'eager' : 'lazy'}
+          fetchpriority={i === 0 ? 'high' : 'low'}
           decoding="async"
         />
       </picture>

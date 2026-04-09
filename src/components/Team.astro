@@ -40,7 +40,6 @@ const photos = [
             width="480"
             height="270"
             loading="lazy"
-            onerror="this.parentElement.style.background='var(--color-surface)'"
           />
         </div>
       ))
@@ -113,3 +112,11 @@ const photos = [
     display: flex;
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLImageElement>('.team__photo img').forEach((img) => {
+    img.addEventListener('error', () => {
+      (img.parentElement as HTMLElement).style.background = 'var(--color-surface)';
+    });
+  });
+</script>
