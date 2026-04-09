@@ -1,0 +1,84 @@
+---
+// src/components/Why1440Dialog.astro
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/utils';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<dialog class="why-dialog" id="why-dialog">
+  <div class="why-dialog__inner">
+    <button class="why-dialog__close" id="why-dialog-close" aria-label="Close">✕</button>
+    <p class="label">{t('why.label')}</p>
+    <p class="why-dialog__text">{t('why.text')}</p>
+  </div>
+</dialog>
+
+<style>
+  .why-dialog {
+    background: var(--color-bg);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md, 12px);
+    padding: 0;
+    width: min(640px, calc(100vw - 40px));
+    margin: auto;
+  }
+
+  .why-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+  }
+
+  .why-dialog__inner {
+    padding: 48px;
+    position: relative;
+  }
+
+  .why-dialog__close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: transparent;
+    border: none;
+    color: var(--color-muted);
+    font-size: 18px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+    transition: color 0.15s ease;
+  }
+
+  .why-dialog__close:hover {
+    color: var(--color-text);
+  }
+
+  .why-dialog__text {
+    font-size: clamp(16px, 1.8vw, 22px);
+    color: var(--color-muted);
+    line-height: 1.7;
+    margin-top: 16px;
+  }
+
+  @media (max-width: 600px) {
+    .why-dialog__inner { padding: 32px 24px; }
+  }
+</style>
+
+<script>
+  const dialog = document.getElementById('why-dialog') as HTMLDialogElement;
+  const closeBtn = document.getElementById('why-dialog-close')!;
+
+  document.addEventListener('click', (e) => {
+    const trigger = (e.target as Element).closest('[data-open-dialog="why-dialog"]');
+    if (trigger) dialog.showModal();
+  });
+
+  closeBtn.addEventListener('click', () => dialog.close());
+
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+</script>

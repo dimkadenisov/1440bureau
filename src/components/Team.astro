@@ -1,75 +1,71 @@
 ---
 // src/components/Team.astro
-import { useTranslations } from '../i18n/utils';
-import type { Lang } from '../i18n/utils';
+import { useTranslations } from "../i18n/utils";
+import type { Lang } from "../i18n/utils";
 
-interface Props { lang: Lang }
+interface Props {
+  lang: Lang;
+}
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const photos = [
-  '/team/16-9-1-foto-Komanda_Obschaya-scaled.jpg',
-  '/team/16-9-2-foto-Komanda-i-sputniki-scaled.jpg',
-  '/team/16-9-4-foto-Komanda-i-sputniki-scaled.jpg',
-  '/team/16-9-6-foto-cUP_3-scaled.jpg',
-  '/team/3-foto-cUP_1-scaled.jpg',
-  '/team/16-9-5-foto-Sotrudniki-scaled.jpg',
+  "/team/16-9-1-foto-Komanda_Obschaya-scaled.jpg",
+  "/team/16-9-2-foto-Komanda-i-sputniki-scaled.jpg",
+  "/team/16-9-4-foto-Komanda-i-sputniki-scaled.jpg",
+  "/team/16-9-6-foto-cUP_3-scaled.jpg",
+  "/team/3-foto-cUP_1-scaled.jpg",
+  "/team/16-9-5-foto-Sotrudniki-scaled.jpg",
 ];
 ---
 
 <section class="section" id="team">
-  <p class="label" data-animate>{t('team.label')}</p>
-  <div class="team__header">
-    <h2 class="team__title" data-animate>{t('team.title')}</h2>
-    <div class="team__stats" data-animate="fade">
-      <p class="team__stat">{t('team.stat_count')}</p>
-      <p class="team__stat team__stat--muted">{t('team.stat_engineers')}</p>
-    </div>
+  <p class="label" data-animate>{t("team.label")}</p>
+  <h2 class="team__title" data-animate>{t("team.title")}</h2>
+  <div class="team__stats" data-animate="fade">
+    <p class="team__stat">{t("team.stat_count")}</p>
+    <p class="team__stat team__stat--muted">{t("team.stat_engineers")}</p>
   </div>
 
   <div class="team__carousel" data-animate="fade">
-    {photos.map((src, i) => (
-      <div class="team__photo">
-        <img
-          src={src}
-          alt={`Team member ${i + 1}`}
-          width="480"
-          height="270"
-          loading="lazy"
-          onerror="this.parentElement.style.background='var(--color-surface)'"
-        />
-      </div>
-    ))}
+    {
+      photos.map((src, i) => (
+        <div class="team__photo">
+          <img
+            src={src}
+            alt={`Team member ${i + 1}`}
+            width="480"
+            height="270"
+            loading="lazy"
+            onerror="this.parentElement.style.background='var(--color-surface)'"
+          />
+        </div>
+      ))
+    }
   </div>
 
   <div class="team__cta" data-animate>
-    <a href="mailto:join@1440.space" class="btn btn-secondary">{t('team.cta')} →</a>
+    <a href="mailto:join@1440.space" class="btn btn-secondary"
+      >{t("team.cta")} →</a
+    >
   </div>
 </section>
 
 <style>
-  .team__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 40px;
-    margin: 12px 0 48px;
-    flex-wrap: wrap;
-  }
-
   .team__title {
     font-size: clamp(22px, 2.5vw, 38px);
     font-weight: 700;
     letter-spacing: -0.02em;
     max-width: 500px;
     line-height: 1.2;
+    margin: 12px 0 24px;
   }
 
   .team__stats {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    flex-shrink: 0;
+    margin-bottom: 48px;
   }
 
   .team__stat {
@@ -93,7 +89,9 @@ const photos = [
     margin-bottom: 40px;
   }
 
-  .team__carousel::-webkit-scrollbar { display: none; }
+  .team__carousel::-webkit-scrollbar {
+    display: none;
+  }
 
   .team__photo {
     flex-shrink: 0;
