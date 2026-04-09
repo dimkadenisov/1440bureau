@@ -18,8 +18,8 @@ const otherLangPath = getLocalePath(otherLang, currentPath);
 <nav class="nav" id="nav">
   <div class="nav__inner">
     <a href={getLocalePath(lang)} class="nav__logo" aria-label="Бюро 1440">
-      <img src="/logos/logo-icon.svg" alt="" width="24" height="24" />
-      <img src="/logos/logo-text.svg" alt="Бюро 1440" width="132" height="16" />
+      <img src={`${import.meta.env.BASE_URL}logos/logo-icon.svg`} alt="" width="24" height="24" />
+      <img src={`${import.meta.env.BASE_URL}logos/logo-text.svg`} alt="Бюро 1440" width="132" height="16" />
     </a>
 
     <ul class="nav__links" role="list">

@@ -8,19 +8,20 @@ interface Props { lang: Lang }
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 
+const b = import.meta.env.BASE_URL;
 const solutions = [
-  { key: 'extractive', desktopSrc: '/solutions/extractive-desktop.webp', mobileSrc: '/solutions/extractive-mobile.webp' },
-  { key: 'geo',        desktopSrc: '/solutions/geo-desktop.webp',        mobileSrc: '/solutions/geo-mobile.webp'        },
-  { key: 'telecom',   desktopSrc: '/solutions/telecom-desktop.webp',    mobileSrc: '/solutions/telecom-mobile.webp'    },
-  { key: 'aviation',  desktopSrc: '/solutions/aviation-desktop.webp',   mobileSrc: '/solutions/aviation-mobile.webp'   },
-  { key: 'rail',      desktopSrc: '/solutions/rail-desktop.webp',       mobileSrc: '/solutions/rail-mobile.webp'       },
-  { key: 'maritime',  desktopSrc: '/solutions/maritime-desktop.webp',   mobileSrc: '/solutions/maritime-mobile.webp'   },
-  { key: 'auto',      desktopSrc: '/solutions/auto-desktop.webp',       mobileSrc: '/solutions/auto-mobile.webp'       },
-  { key: 'education', desktopSrc: '/solutions/education-desktop.webp',  mobileSrc: '/solutions/education-mobile.webp'  },
-  { key: 'health',    desktopSrc: '/solutions/health-desktop.webp',     mobileSrc: '/solutions/health-mobile.webp'     },
-  { key: 'emergency', desktopSrc: '/solutions/emergency-desktop.webp',  mobileSrc: '/solutions/emergency-mobile.webp'  },
-  { key: 'gov',       desktopSrc: '/solutions/gov-desktop.webp',        mobileSrc: '/solutions/gov-mobile.webp'        },
-] as const;
+  { key: 'extractive', desktopSrc: `${b}solutions/extractive-desktop.webp`, mobileSrc: `${b}solutions/extractive-mobile.webp` },
+  { key: 'geo',        desktopSrc: `${b}solutions/geo-desktop.webp`,        mobileSrc: `${b}solutions/geo-mobile.webp`        },
+  { key: 'telecom',   desktopSrc: `${b}solutions/telecom-desktop.webp`,    mobileSrc: `${b}solutions/telecom-mobile.webp`    },
+  { key: 'aviation',  desktopSrc: `${b}solutions/aviation-desktop.webp`,   mobileSrc: `${b}solutions/aviation-mobile.webp`   },
+  { key: 'rail',      desktopSrc: `${b}solutions/rail-desktop.webp`,       mobileSrc: `${b}solutions/rail-mobile.webp`       },
+  { key: 'maritime',  desktopSrc: `${b}solutions/maritime-desktop.webp`,   mobileSrc: `${b}solutions/maritime-mobile.webp`   },
+  { key: 'auto',      desktopSrc: `${b}solutions/auto-desktop.webp`,       mobileSrc: `${b}solutions/auto-mobile.webp`       },
+  { key: 'education', desktopSrc: `${b}solutions/education-desktop.webp`,  mobileSrc: `${b}solutions/education-mobile.webp`  },
+  { key: 'health',    desktopSrc: `${b}solutions/health-desktop.webp`,     mobileSrc: `${b}solutions/health-mobile.webp`     },
+  { key: 'emergency', desktopSrc: `${b}solutions/emergency-desktop.webp`,  mobileSrc: `${b}solutions/emergency-mobile.webp`  },
+  { key: 'gov',       desktopSrc: `${b}solutions/gov-desktop.webp`,        mobileSrc: `${b}solutions/gov-mobile.webp`        },
+];
 ---
 
 <section class="solutions" id="solutions">

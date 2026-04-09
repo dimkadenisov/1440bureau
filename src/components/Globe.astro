@@ -7,7 +7,7 @@
   <img
     class="globe-fallback"
     id="globe-fallback"
-    src="/globe-snapshot.webp"
+    src={`${import.meta.env.BASE_URL}globe-snapshot.webp`}
     aria-hidden="true"
     alt=""
     width="1360"
@@ -58,7 +58,7 @@
     const { GlobeRenderer } = await import('./globe/GlobeRenderer');
 
     const renderer = new GlobeRenderer(canvas);
-    await renderer.loadWorldMap('/world.webp').catch(() => {});
+    await renderer.loadWorldMap(`${import.meta.env.BASE_URL}world.webp`).catch(() => {});
     renderer.buildOrbits();
     renderer.start();
     window.addEventListener('beforeunload', () => renderer.destroy(), { once: true });

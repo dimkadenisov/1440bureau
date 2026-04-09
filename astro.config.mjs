@@ -2,7 +2,8 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://1440.space',
+  site: 'https://dimkadenisov.github.io',
+  base: '/1440bureau',
   i18n: {
     defaultLocale: 'ru',
     locales: ['ru', 'en'],
