@@ -1,6 +1,7 @@
 ---
 // src/components/Nav.astro
 import { useTranslations, getLocalePath } from '../i18n/utils';
+import Button from './Button.astro';
 import type { Lang } from '../i18n/utils';
 
 interface Props {
@@ -31,7 +32,7 @@ const otherLangPath = getLocalePath(otherLang, currentPath);
 
     <div class="nav__actions">
       <a href={otherLangPath} class="nav__lang">{otherLang.toUpperCase()}</a>
-      <a href="mailto:connect@1440.space" class="btn btn-primary btn--sm">{t('nav.cta')}</a>
+      <Button href="mailto:connect@1440.space" variant="primary">{t('nav.cta')}</Button>
     </div>
 
     <button class="nav__burger" aria-label="Menu" aria-expanded="false" id="nav-burger">
@@ -60,7 +61,7 @@ const otherLangPath = getLocalePath(otherLang, currentPath);
   }
 
   .nav__inner {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 0 40px;
     height: 100%;
@@ -111,12 +112,7 @@ const otherLangPath = getLocalePath(otherLang, currentPath);
     color: var(--color-text);
   }
 
-  .btn--sm {
-    padding: 7px 14px;
-    font-size: 12px;
-  }
-
-  .nav__burger {
+.nav__burger {
     display: none;
     flex-direction: column;
     gap: 5px;

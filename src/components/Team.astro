@@ -1,6 +1,8 @@
 ---
 // src/components/Team.astro
 import { useTranslations } from "../i18n/utils";
+import Button from "./Button.astro";
+import SectionTitle from "./SectionTitle.astro";
 import type { Lang } from "../i18n/utils";
 
 interface Props {
@@ -21,7 +23,8 @@ const photos = [
 
 <section class="section" id="team">
   <p class="label" data-animate>{t("team.label")}</p>
-  <h2 class="team__title" data-animate>{t("team.title")}</h2>
+  <SectionTitle class="team__title" data-animate>{t("team.title")}</SectionTitle
+  >
   <div class="team__stats" data-animate="fade">
     <p class="team__stat">{t("team.stat_count")}</p>
     <p class="team__stat team__stat--muted">{t("team.stat_engineers")}</p>
@@ -45,19 +48,15 @@ const photos = [
   </div>
 
   <div class="team__cta" data-animate>
-    <a href="mailto:join@1440.space" class="btn btn-secondary"
-      >{t("team.cta")} →</a
+    <Button href="mailto:join@1440.space" variant="secondary"
+      >{t("team.cta")} →</Button
     >
   </div>
 </section>
 
 <style>
   .team__title {
-    font-size: clamp(22px, 2.5vw, 38px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    max-width: 500px;
-    line-height: 1.2;
+    max-width: 850px;
     margin: 12px 0 24px;
   }
 

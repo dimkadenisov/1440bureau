@@ -1,6 +1,7 @@
 ---
 // src/components/Solutions.astro
 import { useTranslations } from '../i18n/utils';
+import SectionTitle from './SectionTitle.astro';
 import type { Lang } from '../i18n/utils';
 
 interface Props { lang: Lang }
@@ -46,7 +47,7 @@ const solutions = [
   <!-- Constrained content -->
   <div class="section solutions__inner">
     <p class="label" data-animate>{t('solutions.label')}</p>
-    <h2 class="solutions__title" data-animate>{t('solutions.title')}</h2>
+    <SectionTitle class="solutions__title" data-animate>{t('solutions.title')}</SectionTitle>
 
     <div class="solutions__accordion" role="list">
       {solutions.map(({ key }, i) => (
@@ -86,9 +87,6 @@ const solutions = [
   }
 
   .solutions__title {
-    font-size: clamp(24px, 3vw, 44px);
-    font-weight: 700;
-    letter-spacing: -0.02em;
     margin: 12px 0 32px;
   }
 

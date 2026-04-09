@@ -2,6 +2,7 @@
 // src/components/Hero.astro
 import Globe from "./Globe.astro";
 import Why1440Dialog from "./Why1440Dialog.astro";
+import Button from "./Button.astro";
 import { useTranslations } from "../i18n/utils";
 import type { Lang } from "../i18n/utils";
 
@@ -19,10 +20,8 @@ const t = useTranslations(lang);
     <p class="hero__subtitle" data-animate>{t("hero.subtitle")}</p>
 
     <div class="hero__ctas" data-animate>
-      <a href="mailto:connect@1440.space" class="btn btn-primary">{t("hero.cta_primary")}</a>
-      <a href="#mission" class="btn btn-secondary"
-        >{t("hero.cta_secondary")} ↓</a
-      >
+      <Button href="mailto:connect@1440.space" variant="primary">{t("hero.cta_primary")}</Button>
+      <Button href="#mission" variant="secondary">{t("hero.cta_secondary")} ↓</Button>
     </div>
   </div>
 
