@@ -9,30 +9,30 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const solutions = [
-  { key: 'extractive', desktopSrc: '/solutions/extractive-desktop.jpg', desktopType: 'image/jpeg', mobileSrc: '/solutions/extractive-mobile.png', mobileType: 'image/png' },
-  { key: 'geo',        desktopSrc: '/solutions/geo-desktop.png',        desktopType: 'image/png',  mobileSrc: '/solutions/geo-mobile.png',        mobileType: 'image/png' },
-  { key: 'telecom',   desktopSrc: '/solutions/telecom-desktop.jpg',    desktopType: 'image/jpeg', mobileSrc: '/solutions/telecom-mobile.png',    mobileType: 'image/png' },
-  { key: 'aviation',  desktopSrc: '/solutions/aviation-desktop.webp',  desktopType: 'image/webp', mobileSrc: '/solutions/aviation-mobile.png',  mobileType: 'image/png' },
-  { key: 'rail',      desktopSrc: '/solutions/rail-desktop.png',       desktopType: 'image/png',  mobileSrc: '/solutions/rail-mobile.png',      mobileType: 'image/png' },
-  { key: 'maritime',  desktopSrc: '/solutions/maritime-desktop.webp',  desktopType: 'image/webp', mobileSrc: '/solutions/maritime-mobile.png',  mobileType: 'image/png' },
-  { key: 'auto',      desktopSrc: '/solutions/auto-desktop.webp',      desktopType: 'image/webp', mobileSrc: '/solutions/auto-mobile.png',      mobileType: 'image/png' },
-  { key: 'education', desktopSrc: '/solutions/education-desktop.webp', desktopType: 'image/webp', mobileSrc: '/solutions/education-mobile.png', mobileType: 'image/png' },
-  { key: 'health',    desktopSrc: '/solutions/health-desktop.webp',    desktopType: 'image/webp', mobileSrc: '/solutions/health-mobile.png',    mobileType: 'image/png' },
-  { key: 'emergency', desktopSrc: '/solutions/emergency-desktop.webp', desktopType: 'image/webp', mobileSrc: '/solutions/emergency-mobile.png', mobileType: 'image/png' },
-  { key: 'gov',       desktopSrc: '/solutions/gov-desktop.png',        desktopType: 'image/png',  mobileSrc: '/solutions/gov-mobile.png',       mobileType: 'image/png' },
+  { key: 'extractive', desktopSrc: '/solutions/extractive-desktop.webp', mobileSrc: '/solutions/extractive-mobile.webp' },
+  { key: 'geo',        desktopSrc: '/solutions/geo-desktop.webp',        mobileSrc: '/solutions/geo-mobile.webp'        },
+  { key: 'telecom',   desktopSrc: '/solutions/telecom-desktop.webp',    mobileSrc: '/solutions/telecom-mobile.webp'    },
+  { key: 'aviation',  desktopSrc: '/solutions/aviation-desktop.webp',   mobileSrc: '/solutions/aviation-mobile.webp'   },
+  { key: 'rail',      desktopSrc: '/solutions/rail-desktop.webp',       mobileSrc: '/solutions/rail-mobile.webp'       },
+  { key: 'maritime',  desktopSrc: '/solutions/maritime-desktop.webp',   mobileSrc: '/solutions/maritime-mobile.webp'   },
+  { key: 'auto',      desktopSrc: '/solutions/auto-desktop.webp',       mobileSrc: '/solutions/auto-mobile.webp'       },
+  { key: 'education', desktopSrc: '/solutions/education-desktop.webp',  mobileSrc: '/solutions/education-mobile.webp'  },
+  { key: 'health',    desktopSrc: '/solutions/health-desktop.webp',     mobileSrc: '/solutions/health-mobile.webp'     },
+  { key: 'emergency', desktopSrc: '/solutions/emergency-desktop.webp',  mobileSrc: '/solutions/emergency-mobile.webp'  },
+  { key: 'gov',       desktopSrc: '/solutions/gov-desktop.webp',        mobileSrc: '/solutions/gov-mobile.webp'        },
 ] as const;
 ---
 
 <section class="solutions" id="solutions">
   <!-- Full-width background layer -->
   <div class="solutions__bg" aria-hidden="true">
-    {solutions.map(({ key, desktopSrc, desktopType, mobileSrc, mobileType }, i) => (
+    {solutions.map(({ key, desktopSrc, mobileSrc }, i) => (
       <picture
         class:list={['solutions__bg-picture', { 'solutions__bg-picture--active': i === 0 }]}
         data-solution={key}
       >
-        <source media="(max-width: 768px)" srcset={mobileSrc} type={mobileType} />
-        <source media="(min-width: 769px)" srcset={desktopSrc} type={desktopType} />
+        <source media="(max-width: 768px)" srcset={mobileSrc} type="image/webp" />
+        <source media="(min-width: 769px)" srcset={desktopSrc} type="image/webp" />
         <img
           src={desktopSrc}
           alt=""
