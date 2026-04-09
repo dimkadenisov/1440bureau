@@ -23,11 +23,31 @@ const solutions = [
 ---
 
 <section class="section solutions" id="solutions">
+  <!-- Section-level background -->
+  <div class="solutions__bg" aria-hidden="true">
+    {solutions.map(({ key, desktopSrc, desktopType, mobileSrc, mobileType }, i) => (
+      <picture
+        class:list={['solutions__bg-picture', { 'solutions__bg-picture--active': i === 0 }]}
+        data-solution={key}
+      >
+        <source media="(max-width: 768px)" srcset={mobileSrc} type={mobileType} />
+        <source media="(min-width: 769px)" srcset={desktopSrc} type={desktopType} />
+        <img
+          src={desktopSrc}
+          alt=""
+          loading={i === 0 ? 'eager' : 'lazy'}
+          decoding="async"
+        />
+      </picture>
+    ))}
+    <div class="solutions__bg-overlay"></div>
+  </div>
+
   <p class="label" data-animate>{t('solutions.label')}</p>
   <h2 class="solutions__title" data-animate>{t('solutions.title')}</h2>
 
   <div class="solutions__accordion" role="list">
-    {solutions.map(({ key, desktopSrc, desktopType, mobileSrc, mobileType }, i) => (
+    {solutions.map(({ key }, i) => (
       <div
         class:list={['solutions__strip', { 'solutions__strip--active': i === 0 }]}
         role="listitem"
@@ -35,20 +55,6 @@ const solutions = [
         tabindex="0"
         aria-expanded={i === 0 ? 'true' : 'false'}
       >
-        <picture class="solutions__picture" aria-hidden="true">
-          <source media="(max-width: 768px)" srcset={mobileSrc} type={mobileType} />
-          <source media="(min-width: 769px)" srcset={desktopSrc} type={desktopType} />
-          <img
-            src={desktopSrc}
-            alt=""
-            class="solutions__img"
-            loading={i === 0 ? 'eager' : 'lazy'}
-            decoding="async"
-          />
-        </picture>
-
-        <div class="solutions__overlay" aria-hidden="true"></div>
-
         <div class="solutions__header">
           <span class="solutions__num label">{String(i + 1).padStart(2, '0')}</span>
           <span class="solutions__name">{t(`solutions.${key}` as any)}</span>
@@ -64,30 +70,76 @@ const solutions = [
 </section>
 
 <style>
+  /* ── Section ── */
+  .solutions {
+    position: relative;
+    overflow: hidden;
+  }
+
   .solutions__title {
+    position: relative;
+    z-index: 1;
     font-size: clamp(24px, 3vw, 44px);
     font-weight: 700;
     letter-spacing: -0.02em;
     margin: 12px 0 32px;
   }
 
+  /* ── Section-level background ── */
+  .solutions__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .solutions__bg-picture {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+
+  .solutions__bg-picture--active {
+    opacity: 1;
+  }
+
+  .solutions__bg-picture img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+  }
+
+  .solutions__bg-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.55) 50%,
+      rgba(0, 0, 0, 0.35) 100%
+    );
+  }
+
+  /* ── Accordion ── */
   .solutions__accordion {
-    border-top: 1px solid var(--color-border);
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   /* ── Strip ── */
   .solutions__strip {
     position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     cursor: pointer;
-    /* collapsed height */
     height: 52px;
     transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
   }
 
   .solutions__strip:focus-visible {
-    outline: 2px solid var(--color-muted);
+    outline: 2px solid rgba(255, 255, 255, 0.4);
     outline-offset: -2px;
   }
 
@@ -101,51 +153,7 @@ const solutions = [
     }
   }
 
-  /* ── Background image ── */
-  .solutions__picture {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
-
-  .solutions__img {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-    opacity: 0;
-    transform: scale(1.04);
-    transition: opacity 0.5s ease, transform 0.5s ease;
-  }
-
-  .solutions__strip--active .solutions__img {
-    opacity: 1;
-    transform: scale(1);
-  }
-
-  /* ── Gradient overlay ── */
-  .solutions__overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.88) 0%,
-      rgba(0, 0, 0, 0.55) 45%,
-      rgba(0, 0, 0, 0.12) 100%
-    );
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-  }
-
-  .solutions__strip--active .solutions__overlay {
-    opacity: 1;
-  }
-
-  /* ── Header row (always visible) ── */
+  /* ── Header row ── */
   .solutions__header {
     position: absolute;
     top: 0;
@@ -156,24 +164,23 @@ const solutions = [
     align-items: center;
     padding: 0 var(--section-padding, 40px);
     gap: 16px;
-    z-index: 2;
+    z-index: 1;
     transition: background 0.2s ease;
   }
 
   .solutions__strip:not(.solutions__strip--active):hover .solutions__header {
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.04);
   }
 
   .solutions__num {
     flex-shrink: 0;
     width: 28px;
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.35);
     transition: color 0.3s;
   }
 
   .solutions__strip--active .solutions__num {
-    color: #999;
-    color: color-mix(in srgb, var(--color-muted) 60%, white);
+    color: rgba(255, 255, 255, 0.6);
   }
 
   .solutions__name {
@@ -182,7 +189,7 @@ const solutions = [
     font-weight: 500;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.55);
     transition: color 0.3s;
   }
 
@@ -190,10 +197,14 @@ const solutions = [
     color: #fff;
   }
 
+  .solutions__strip:not(.solutions__strip--active):hover .solutions__name {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
   .solutions__arrow {
     flex-shrink: 0;
     font-size: 14px;
-    color: var(--color-border);
+    color: rgba(255, 255, 255, 0.2);
     transition: color 0.3s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
@@ -203,7 +214,7 @@ const solutions = [
   }
 
   .solutions__strip:not(.solutions__strip--active):hover .solutions__arrow {
-    color: var(--color-muted);
+    color: rgba(255, 255, 255, 0.5);
   }
 
   /* ── Expanded body ── */
@@ -212,7 +223,6 @@ const solutions = [
     bottom: 0;
     left: 0;
     right: 0;
-    z-index: 2;
     padding: 0 var(--section-padding, 40px) 28px;
     opacity: 0;
     transform: translateY(10px);
@@ -249,12 +259,17 @@ const solutions = [
 <script>
   function initSolutions() {
     const strips = document.querySelectorAll<HTMLElement>('.solutions__strip');
+    const bgPictures = document.querySelectorAll<HTMLElement>('.solutions__bg-picture');
 
     function activate(target: HTMLElement) {
+      const key = target.dataset.solution;
       strips.forEach((s) => {
         const isTarget = s === target;
         s.classList.toggle('solutions__strip--active', isTarget);
         s.setAttribute('aria-expanded', String(isTarget));
+      });
+      bgPictures.forEach((p) => {
+        p.classList.toggle('solutions__bg-picture--active', p.dataset.solution === key);
       });
     }
 
