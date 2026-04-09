@@ -8,12 +8,12 @@ const { lang } = Astro.props;
 const t = useTranslations(lang);
 
 const photos = [
-  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a5e_team-1.webp',
-  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a5f_team-2.webp',
-  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a60_team-3.webp',
-  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a61_team-4.webp',
-  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a62_team-5.webp',
-  'https://cdn.prod.website-files.com/664b027037a9f506ff125a25/664b027037a9f506ff125a63_team-6.webp',
+  '/team/16-9-1-foto-Komanda_Obschaya-scaled.jpg',
+  '/team/16-9-2-foto-Komanda-i-sputniki-scaled.jpg',
+  '/team/16-9-4-foto-Komanda-i-sputniki-scaled.jpg',
+  '/team/16-9-6-foto-cUP_3-scaled.jpg',
+  '/team/3-foto-cUP_1-scaled.jpg',
+  '/team/16-9-5-foto-Sotrudniki-scaled.jpg',
 ];
 ---
 
@@ -33,8 +33,8 @@ const photos = [
         <img
           src={src}
           alt={`Team member ${i + 1}`}
-          width="400"
-          height="500"
+          width="480"
+          height="270"
           loading="lazy"
           onerror="this.parentElement.style.background='var(--color-surface)'"
         />
@@ -97,8 +97,8 @@ const photos = [
 
   .team__photo {
     flex-shrink: 0;
-    width: 280px;
-    height: 360px;
+    width: 480px;
+    aspect-ratio: 16 / 9;
     border-radius: 6px;
     overflow: hidden;
     scroll-snap-align: start;
