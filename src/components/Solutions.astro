@@ -22,8 +22,8 @@ const solutions = [
 ] as const;
 ---
 
-<section class="section solutions" id="solutions">
-  <!-- Section-level background -->
+<section class="solutions" id="solutions">
+  <!-- Full-width background layer -->
   <div class="solutions__bg" aria-hidden="true">
     {solutions.map(({ key, desktopSrc, desktopType, mobileSrc, mobileType }, i) => (
       <picture
@@ -43,42 +43,49 @@ const solutions = [
     <div class="solutions__bg-overlay"></div>
   </div>
 
-  <p class="label" data-animate>{t('solutions.label')}</p>
-  <h2 class="solutions__title" data-animate>{t('solutions.title')}</h2>
+  <!-- Constrained content -->
+  <div class="section solutions__inner">
+    <p class="label" data-animate>{t('solutions.label')}</p>
+    <h2 class="solutions__title" data-animate>{t('solutions.title')}</h2>
 
-  <div class="solutions__accordion" role="list">
-    {solutions.map(({ key }, i) => (
-      <div
-        class:list={['solutions__strip', { 'solutions__strip--active': i === 0 }]}
-        role="listitem"
-        data-solution={key}
-        tabindex="0"
-        aria-expanded={i === 0 ? 'true' : 'false'}
-      >
-        <div class="solutions__header">
-          <span class="solutions__num label">{String(i + 1).padStart(2, '0')}</span>
-          <span class="solutions__name">{t(`solutions.${key}` as any)}</span>
-          <span class="solutions__arrow" aria-hidden="true">→</span>
-        </div>
+    <div class="solutions__accordion" role="list">
+      {solutions.map(({ key }, i) => (
+        <div
+          class:list={['solutions__strip', { 'solutions__strip--active': i === 0 }]}
+          role="listitem"
+          data-solution={key}
+          tabindex="0"
+          aria-expanded={i === 0 ? 'true' : 'false'}
+        >
+          <div class="solutions__header">
+            <span class="solutions__num label">{String(i + 1).padStart(2, '0')}</span>
+            <span class="solutions__name">{t(`solutions.${key}` as any)}</span>
+            <span class="solutions__arrow" aria-hidden="true">→</span>
+          </div>
 
-        <div class="solutions__body">
-          <p class="solutions__desc">{t(`solutions.${key}_desc` as any)}</p>
+          <div class="solutions__body">
+            <p class="solutions__desc">{t(`solutions.${key}_desc` as any)}</p>
+          </div>
         </div>
-      </div>
-    ))}
+      ))}
+    </div>
   </div>
 </section>
 
 <style>
-  /* ── Section ── */
+  /* ── Section (full-width) ── */
   .solutions {
     position: relative;
     overflow: hidden;
   }
 
-  .solutions__title {
+  /* Content wrapper inherits .section max-width + padding */
+  .solutions__inner {
     position: relative;
     z-index: 1;
+  }
+
+  .solutions__title {
     font-size: clamp(24px, 3vw, 44px);
     font-weight: 700;
     letter-spacing: -0.02em;
